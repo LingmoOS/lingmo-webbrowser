@@ -1,8 +1,9 @@
 import QtQuick
+import QtQuick.Controls
 import QtQuick.Layouts
 import QtWebEngine
 import LingmoUI
-import QtQuick.Controls.LingmoStyle
+import LingmoUI.CompatibleModule
 
 LingmoWindow{
     id: window
@@ -18,54 +19,21 @@ LingmoWindow{
         return request.responseText;
     }
     property string home_url: 'https://lingmo.org'
+    Component.onCompleted: {
+        newTab()
+    }
     Row{
         id: tabRow
         height: 40
         TabBar{
             id: tabBar
-            anchors.left: parent.left
+            width: implicitWidth
             height: 40
-            contentHeight: 30
-            background: Rectangle{
-                color: 'transparent'
-            }
-            spacing:5
-            padding:5
-            TabButton{
-                id: tabButton
-                implicitWidth: 200
-                width: implicitWidth
-                background: Rectangle{
-                    color: LingmoTheme.dark ? Qt.rgba(0,0,0,1) : Qt.rgba(1,1,1,1) 
-                    radius: LingmoUnits.smallRadius
-                }
-                LingmoText{
-                    text:'111'
-                    color: window.textColor
-                    anchors.verticalCenter: parent.verticalCenter
-                }
+            newTabVisibile: true
+            onNewTabClicked: {
+                window.newTab()
             }
         }
-        LingmoIconButton {
-            id: btn_add
-            width: 40
-            height: 30
-            anchors.left: tabBar.right
-            padding: 0
-            verticalPadding: 0
-            horizontalPadding: 0
-            rightPadding: 2
-            iconSource: LingmoIcons.Add
-            anchors.verticalCenter: parent.verticalCenter
-            iconSize: 15
-            text: qsTr('Add New Tab')
-            radius: LingmoUnits.windowRadius
-            iconColor: window.textColor
-            onClicked: {
-                tabBar.addItem(tabButton)
-            }
-        }
-        
     }
     Rectangle{
         id: toolArea
@@ -80,7 +48,7 @@ LingmoWindow{
             spacing: 0
             LingmoIconButton {
                 id: btn_back
-                enabled: webView.canGoBack
+                enabled: stack_webView.currentItem.canGoBack
                 Layout.preferredWidth: 40
                 Layout.preferredHeight: 30
                 padding: 0
@@ -94,12 +62,12 @@ LingmoWindow{
                 radius: LingmoUnits.windowRadius
                 iconColor: window.textColor
                 onClicked: {
-                    webView.goBack()
+                    stack_webView.currentItem.goBack()
                 }
             }
             LingmoIconButton {
                 id: btn_forward
-                enabled: webView.canGoForward
+                enabled: stack_webView.currentItem.canGoForward
                 Layout.preferredWidth: 40
                 Layout.preferredHeight: 30
                 padding: 0
@@ -113,7 +81,7 @@ LingmoWindow{
                 radius: LingmoUnits.windowRadius
                 iconColor: window.textColor
                 onClicked: {
-                    webView.goForward()
+                    stack_webView.currentItem.goForward()
                 }
             }
             LingmoIconButton {
@@ -124,18 +92,18 @@ LingmoWindow{
                 verticalPadding: 0
                 horizontalPadding: 0
                 rightPadding: 2
-                iconSource: webView.loading ? LingmoIcons.Cancel : LingmoIcons.Refresh 
+                iconSource: stack_webView.currentItem.loading ? LingmoIcons.Cancel : LingmoIcons.Refresh 
                 Layout.alignment: Qt.AlignVCenter
                 iconSize: 15
-                text: webView.loading ? qsTr('Cancel Reload') : qsTr('Reload')
+                text: stack_webView.currentItem.loading ? qsTr('Cancel Reload') : qsTr('Reload')
                 radius: LingmoUnits.windowRadius
                 iconColor: window.textColor
                 onClicked: {
-                    if(webView.loading){
-                        webView.stop();
+                    if(stack_webView.currentItem.loading){
+                        stack_webView.currentItem.stop();
                     }
                     else{
-                        webView.reload();
+                        stack_webView.currentItem.reload();
                     }
                 }
             }
@@ -154,19 +122,19 @@ LingmoWindow{
                 radius: LingmoUnits.windowRadius
                 iconColor: window.textColor
                 onClicked: {
-                    webView.url= window.home_url
+                    stack_webView.currentItem.url= window.home_url
                 }
             }
         }
         LingmoTextBox{
             id: urlLine
-            text: webView.url
+            text: stack_webView.currentItem.url
             anchors.left: contorlButtons.right
             anchors.right: btn_more.left
             cleanEnabled: false
             height: parent.height
             onCommit: {
-                webView.url=urlLine.text
+                stack_webView.currentItem.url=urlLine.text
             }
         }
         LingmoIconButton {
@@ -186,18 +154,30 @@ LingmoWindow{
             anchors.right:parent.right
         }
     }
-    StackLayout{
+    TabView{
+        id: stack_webView
         currentIndex: tabBar.currentIndex
         anchors.top: toolArea.bottom
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: parent.right
-        WebEngineView{
-            id: webView
-            url: window.home_url
-            onUrlChanged: {
-                urlLine.text = url
+        Component{
+            id: com_webWiew
+            WebEngineView{
+                id: web_web_view
+                url: window.home_url
+                onUrlChanged: {
+                    urlLine.text = url
+                }
+                onNewWindowRequested: {
+                    window.newTab()
+                }
             }
         }
+        
+    }
+    function newTab(url= window.home_url){
+        tabBar.model+=1;
+        stack_webView.addTab(com_webWiew,{"url": url});
     }
 }

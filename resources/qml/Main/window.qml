@@ -3,7 +3,6 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtWebEngine
 import LingmoUI
-import LingmoUI.CompatibleModule
 
 LingmoWindow{
     id: window
@@ -18,28 +17,18 @@ LingmoWindow{
         request.send(null);
         return request.responseText;
     }
-    property string home_url: 'https://lingmo.org'
+    property string home_url: 'https://baidu.com'
+    function newTab(url= window.home_url){
+        stack_webView.appendTab(undefined,qsTr("New Tab"),com_webWiew,{"url": url});
+    }
     Component.onCompleted: {
         newTab()
-    }
-    Row{
-        id: tabRow
-        height: 40
-        TabBar{
-            id: tabBar
-            width: implicitWidth
-            height: 40
-            newTabVisibile: true
-            onNewTabClicked: {
-                window.newTab()
-            }
-        }
     }
     Rectangle{
         id: toolArea
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.top: tabRow.bottom
+        anchors.top: parent.top
         height: 30
         color: "transparent"
         RowLayout {
@@ -151,33 +140,28 @@ LingmoWindow{
             text: qsTr('More')
             radius: LingmoUnits.windowRadius
             iconColor: window.textColor
-            anchors.right:parent.right
+            anchors.right: parent.right
         }
     }
-    TabView{
+    LingmoTabView{
         id: stack_webView
-        currentIndex: tabBar.currentIndex
-        anchors.top: toolArea.bottom
-        anchors.bottom: parent.bottom
-        anchors.left: parent.left
-        anchors.right: parent.right
-        Component{
-            id: com_webWiew
-            WebEngineView{
-                id: web_web_view
-                url: window.home_url
-                onUrlChanged: {
-                    urlLine.text = url
-                }
-                onNewWindowRequested: {
-                    window.newTab()
-                }
+        anchors.topMargin: 30
+        onNewPressed: {
+            window.newTab()
+        }
+    }
+    Component{
+        id: com_webWiew
+        WebEngineView{
+            id: web_web_view
+            url: window.home_url
+            onUrlChanged: {
+                urlLine.text = url
+            }
+            onNewWindowRequested: {
+                newView=window.newTab()
+                request.openIn(web_web_view)
             }
         }
-        
-    }
-    function newTab(url= window.home_url){
-        tabBar.model+=1;
-        stack_webView.addTab(com_webWiew,{"url": url});
     }
 }

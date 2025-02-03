@@ -149,19 +149,48 @@ LingmoWindow{
         onNewPressed: {
             window.newTab()
         }
+        onCurrentIndexChanged: {
+            urlLine.text=currentItem.argument.url
+            i
+        }
     }
-    Component{
-        id: com_webWiew
-        WebEngineView{
-            id: web_web_view
-            url: window.home_url
+    property Component com_webWiew: WebEngineView{
+            id: webView_
+            url: argument.url
             onUrlChanged: {
                 urlLine.text = url
             }
-            onNewWindowRequested: {
-                newView=window.newTab()
-                request.openIn(web_web_view)
+            onNewWindowRequested: function(request) {
+                stack_webView.currentIndex=stack_webView.count-1
+                window.newTab(request.requestedUrl)
             }
+            onTitleChanged:{
+                stack_webView.currentItem.text=title
+            }
+            onIconChanged:{
+                stack_webView.currentItem.icon=icon
+            }
+            onWindowCloseRequested: {
+            }
+    }
+    
+    LingmoMenu{
+        id: menu
+        LingmoMenuItem{
+            text: '1'
+        }
+        LingmoMenuItem{
+            text: '1'
+        }
+        LingmoMenuItem{
+            text: '1'
+        }
+        LingmoMenuItem{
+            text: '1'
+        }
+        LingmoMenuItem{
+            text: '1'
         }
     }
+    
 }

@@ -11,7 +11,7 @@ LingmoObject {
         LingmoTheme.blurBehindWindowEnabled = true;
         LingmoTheme.darkMode = LingmoThemeType.Dark;
         LingmoRouter.routes = {
-            "/": "qrc:qml/Main/window.qml"
+            "/": "qrc:/qml/Main/window.qml"
         };
 
         LingmoRouter.navigate("/");

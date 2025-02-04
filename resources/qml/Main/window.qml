@@ -17,9 +17,11 @@ LingmoWindow{
         request.send(null);
         return request.responseText;
     }
-    property string home_url: 'https://baidu.com'
+    property string home_url: 'https://bing.com'
+    property int webViewId: 0
     function newTab(url= window.home_url){
-        stack_webView.appendTab(undefined,qsTr("New Tab"),com_webWiew,{"url": url});
+        stack_webView.appendTab("https://cn.bing.com/sa/simg/favicon-trans-bg-blue-mg-png.png",qsTr("New Tab"),com_webView,{"url": url,"id": webViewId},true);
+        webViewId+=1;
     }
     Component.onCompleted: {
         newTab()
@@ -37,7 +39,6 @@ LingmoWindow{
             spacing: 0
             LingmoIconButton {
                 id: btn_back
-                enabled: stack_webView.currentItem.canGoBack
                 Layout.preferredWidth: 40
                 Layout.preferredHeight: 30
                 padding: 0
@@ -49,14 +50,9 @@ LingmoWindow{
                 iconSize: 15
                 text: qsTr('Back')
                 radius: LingmoUnits.windowRadius
-                iconColor: window.textColor
-                onClicked: {
-                    stack_webView.currentItem.goBack()
-                }
             }
             LingmoIconButton {
                 id: btn_forward
-                enabled: stack_webView.currentItem.canGoForward
                 Layout.preferredWidth: 40
                 Layout.preferredHeight: 30
                 padding: 0
@@ -68,10 +64,6 @@ LingmoWindow{
                 iconSize: 15
                 text: qsTr('Forward')
                 radius: LingmoUnits.windowRadius
-                iconColor: window.textColor
-                onClicked: {
-                    stack_webView.currentItem.goForward()
-                }
             }
             LingmoIconButton {
                 id: btn_reload
@@ -81,20 +73,9 @@ LingmoWindow{
                 verticalPadding: 0
                 horizontalPadding: 0
                 rightPadding: 2
-                iconSource: stack_webView.currentItem.loading ? LingmoIcons.Cancel : LingmoIcons.Refresh 
                 Layout.alignment: Qt.AlignVCenter
                 iconSize: 15
-                text: stack_webView.currentItem.loading ? qsTr('Cancel Reload') : qsTr('Reload')
                 radius: LingmoUnits.windowRadius
-                iconColor: window.textColor
-                onClicked: {
-                    if(stack_webView.currentItem.loading){
-                        stack_webView.currentItem.stop();
-                    }
-                    else{
-                        stack_webView.currentItem.reload();
-                    }
-                }
             }
             LingmoIconButton {
                 id: btn_home
@@ -109,10 +90,6 @@ LingmoWindow{
                 iconSize: 15
                 text: qsTr('Home')
                 radius: LingmoUnits.windowRadius
-                iconColor: window.textColor
-                onClicked: {
-                    stack_webView.currentItem.url= window.home_url
-                }
             }
         }
         LingmoTextBox{
@@ -122,9 +99,6 @@ LingmoWindow{
             anchors.right: btn_more.left
             cleanEnabled: false
             height: parent.height
-            onCommit: {
-                stack_webView.currentItem.url=urlLine.text
-            }
         }
         LingmoIconButton {
             id: btn_more
@@ -141,6 +115,9 @@ LingmoWindow{
             radius: LingmoUnits.windowRadius
             iconColor: window.textColor
             anchors.right: parent.right
+            onClicked: {
+                more_menu.show()
+            }
         }
     }
     LingmoTabView{
@@ -149,33 +126,118 @@ LingmoWindow{
         onNewPressed: {
             window.newTab()
         }
-        onCurrentIndexChanged: {
-            urlLine.text=currentItem.argument.url
-            i
-        }
     }
-    property Component com_webWiew: WebEngineView{
+    Component{
+        id: com_webView
+        WebEngineView{
             id: webView_
             url: argument.url
             onUrlChanged: {
                 urlLine.text = url
             }
             onNewWindowRequested: function(request) {
-                stack_webView.currentIndex=stack_webView.count-1
+
                 window.newTab(request.requestedUrl)
             }
             onTitleChanged:{
-                stack_webView.currentItem.text=title
+                stack_webView.setCurrentText(title);
             }
             onIconChanged:{
-                stack_webView.currentItem.icon=icon
+                var str=icon.toString()
+                stack_webView.setCurrentTabIcon(str.replace("image://favicon/",""));
             }
             onWindowCloseRequested: {
+                stack_webView.closeTab(stack_webView.currentIndex);
             }
+            onLoadingChanged: {
+                btn_reload.iconSource=loading ? LingmoIcons.Cancel : LingmoIcons.Refresh 
+                btn_reload.text=loading ? qsTr('Cancel Reload') : qsTr('Reload')
+            }
+            onCanGoBackChanged: {
+                btn_back.enabled = canGoBack
+            }
+            onCanGoForwardChanged: {
+                btn_forward.enabled = canGoForward
+            }
+            settings.pluginsEnabled: true
+            Connections{
+                target: btn_back
+                enabled: argument.id===stack_webView.currentItem.argument.id
+                function onClicked() {
+                    goBack()
+                }
+            }
+            Connections{
+                target: btn_forward
+                enabled: argument.id===stack_webView.currentItem.argument.id
+                function onClicked() {
+                    goForward()
+                }
+            }
+            Connections{
+                target: btn_reload
+                enabled: argument.id===stack_webView.currentItem.argument.id
+                function onClicked() {
+                    if(loading){
+                        stop();
+                    }
+                    else{
+                        reload()
+                    }
+                }
+            }
+            Connections{
+                target: btn_home
+                enabled: argument.id===stack_webView.currentItem.argument.id
+                function onClicked() {
+                    argument.url=window.home_url;
+                    url=window.home_url;
+                }
+            }
+            Connections{
+                target: urlLine
+                enabled: argument.id===stack_webView.currentItem.argument.id
+                function onCommit(text) {
+                    argument.url=text;
+                    url=text;
+                    forceActiveFocus();
+                }
+            }
+            Connections{
+                target: stack_webView
+                enabled: argument.id===stack_webView.currentItem.argument.id
+                function onCurrentIndexChanged(){
+                    urlLine.text=url
+                }
+            }
+            Component.onCompleted: {
+                btn_back.enabled = canGoBack;
+                btn_forward.enabled = canGoForward;
+                btn_reload.iconSource=loading ? LingmoIcons.Cancel : LingmoIcons.Refresh ;
+                btn_reload.text=loading ? qsTr('Cancel Reload') : qsTr('Reload');
+            }
+        }
     }
-    
     LingmoMenu{
-        id: menu
+        id: more_menu
+        LingmoMenuItem{
+            text: '1'
+        }
+        LingmoMenuItem{
+            text: '1'
+        }
+        LingmoMenuItem{
+            text: '1'
+        }
+        LingmoMenuItem{
+            text: '1'
+        }
+        LingmoMenuItem{
+            text: '1'
+        }
+    }
+    LingmoMenu{
+        id: right_click_menu
         LingmoMenuItem{
             text: '1'
         }

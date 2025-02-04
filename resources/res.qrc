@@ -1,10 +1,6 @@
 <RCC>
-    <qresource>
+    <qresource prefix='/'>
         <file>qml/main.qml</file>
         <file>qml/Main/window.qml</file>
-    </qresource>
-    <qresource prefix='/'>
-        <file>images/light/add.svg</file>
-        <file>images/dark/add.svg</file>
     </qresource>
 </RCC>

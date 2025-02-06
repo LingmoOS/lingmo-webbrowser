@@ -5,14 +5,14 @@ from PySide6.QtCore import*
 from PySide6.QtWebEngineQuick import *
 
 class GlobalKeyHandler(QQuickItem):
-    pressed=Signal(QKeyEvent)
+    f11Pressed=Signal()
     def __init__(self,parent=None):
         super().__init__(parent)
-    def eventFilter(self, watched, event):
+    def eventFilter(self, watched, event: QKeyEvent):
         if event.type()==QEvent.Type.KeyPress:
-            print(1)
-            self.pressed.emit(event)
-            return True
+            if event.key()==Qt.Key.Key_F11:
+                self.f11Pressed.emit()
+                return True
         return False
 
     

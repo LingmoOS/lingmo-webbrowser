@@ -28,7 +28,7 @@ LingmoObject {
         property string home_url: 'https://bing.com'
         property int webViewId: 0
         function newTab(url= window.home_url){
-            stack_webView.appendTab("https://cn.bing.com/sa/simg/favicon-trans-bg-blue-mg-png.png",qsTr("New Tab"),com_webView,{"url": url,"id": webViewId},true);
+            web_tabView.appendTab("https://cn.bing.com/sa/simg/favicon-trans-bg-blue-mg-png.png",qsTr("New Tab"),com_webView,{"url": url,"id": webViewId},true);
             webViewId+=1;
         }
         Component.onCompleted: {
@@ -102,8 +102,8 @@ LingmoObject {
             }
             LingmoTextBox{
                 id: urlLine
-                text: stack_webView.currentItem.url
-                anchors.left: contorlButtons.right
+                text: web_tabView.currentItem.url
+                anchors.left: contorlButtons.right 
                 anchors.right: btn_more.left
                 cleanEnabled: false
                 height: parent.height
@@ -123,12 +123,12 @@ LingmoObject {
                 radius: LingmoUnits.windowRadius
                 anchors.right: parent.right
                 onClicked: {
-                    more_menu.show()
+                    more_menu.open()
                 }
             }
         }
         LingmoTabView{
-            id: stack_webView
+            id: web_tabView
             anchors.topMargin: 30
             onNewPressed: {
                 window.newTab()
@@ -140,22 +140,22 @@ LingmoObject {
                 id: webView_
                 anchors.fill: parent
                 url: argument.url
+                property bool is_fullscreen: false
                 onUrlChanged: {
                     urlLine.text = url
                 }
                 onNewWindowRequested: function(request) {
-
                     window.newTab(request.requestedUrl)
                 }
                 onTitleChanged:{
-                    stack_webView.setCurrentText(title);
+                    web_tabView.setCurrentText(title);
                 }
                 onIconChanged:{
                     var str=icon.toString()
-                    stack_webView.setCurrentTabIcon(str.replace("image://favicon/",""));
+                    web_tabView.setCurrentTabIcon(str.replace("image://favicon/",""));
                 }
                 onWindowCloseRequested: {
-                    stack_webView.closeTab(stack_webView.currentIndex);
+                    web_tabView.closeTab(web_tabView.currentIndex);
                 }
                 onLoadingChanged: {
                     btn_reload.iconSource=loading ? LingmoIcons.Cancel : LingmoIcons.Refresh 
@@ -167,28 +167,43 @@ LingmoObject {
                 onCanGoForwardChanged: {
                     btn_forward.enabled = canGoForward
                 }
-                onFullScreenRequested: {
-                    print(1);
+                onFullScreenRequested: function(request){
+                    if(!is_fullscreen){
+                        if(request.toggleOn){
+                            window.useSystemAppBar=true;
+                            web_tabView.anchors.topMargin=-35;
+                            window.showFullScreen();
+                        }
+                        else{
+                            window.useSystemAppBar=false;
+                            web_tabView.anchors.topMargin=30;
+                            window.showNormal();
+                        }
+                    }
+                    request.accept();
+                }
+                onContextMenuRequested: {
+                    context_menu.open();
                 }
                 settings.pluginsEnabled: true
                 settings.fullScreenSupportEnabled: true
                 Connections{
                     target: btn_back
-                    enabled: argument.id===stack_webView.currentItem.argument.id
+                    enabled: argument.id===web_tabView.currentItem.argument.id
                     function onClicked() {
                         goBack()
                     }
                 }
                 Connections{
                     target: btn_forward
-                    enabled: argument.id===stack_webView.currentItem.argument.id
+                    enabled: argument.id===web_tabView.currentItem.argument.id
                     function onClicked() {
                         goForward()
                     }
                 }
                 Connections{
                     target: btn_reload
-                    enabled: argument.id===stack_webView.currentItem.argument.id
+                    enabled: argument.id===web_tabView.currentItem.argument.id
                     function onClicked() {
                         if(loading){
                             stop();
@@ -200,7 +215,7 @@ LingmoObject {
                 }
                 Connections{
                     target: btn_home
-                    enabled: argument.id===stack_webView.currentItem.argument.id
+                    enabled: argument.id===web_tabView.currentItem.argument.id
                     function onClicked() {
                         argument.url=window.home_url;
                         url=window.home_url;
@@ -208,7 +223,7 @@ LingmoObject {
                 }
                 Connections{
                     target: urlLine
-                    enabled: argument.id===stack_webView.currentItem.argument.id
+                    enabled: argument.id===web_tabView.currentItem.argument.id
                     function onCommit(text) {
                         argument.url=text;
                         url=text;
@@ -216,10 +231,28 @@ LingmoObject {
                     }
                 }
                 Connections{
-                    target: stack_webView
-                    enabled: argument.id===stack_webView.currentItem.argument.id
+                    target: web_tabView
+                    enabled: argument.id===web_tabView.currentItem.argument.id
                     function onCurrentIndexChanged(){
                         urlLine.text=url
+                    }
+                }
+                Connections{
+                    target: global_key_handler
+                    enabled: argument.id===web_tabView.currentItem.argument.id
+                    function onF11Pressed(){
+                        if(is_fullscreen){
+                            window.useSystemAppBar=false;
+                            web_tabView.anchors.topMargin=30;
+                            window.showNormal();
+                            is_fullscreen=false;
+                        }
+                        else{
+                            window.useSystemAppBar=true;
+                            web_tabView.anchors.topMargin=-35;
+                            window.showFullScreen();
+                            is_fullscreen=true;
+                        }
                     }
                 }
                 Component.onCompleted: {
@@ -249,7 +282,7 @@ LingmoObject {
             }
         }
         LingmoMenu{
-            id: right_click_menu
+            id: context_menu
             LingmoMenuItem{
                 text: '1'
             }
@@ -267,10 +300,8 @@ LingmoObject {
             }
         }
         GlobalKeyHandler{
+            id: global_key_handler
             objectName: "global_key_handler"
-            onPressed: function(event){
-                print(1);
-            }
         }
     }
 }

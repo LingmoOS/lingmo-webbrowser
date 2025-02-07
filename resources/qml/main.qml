@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import QtQuick.Dialogs
 import QtWebEngine
 import LingmoUI
 import org.lingmo.webbrowser
@@ -42,7 +43,7 @@ LingmoObject {
             height: 30
             color: "transparent"
             RowLayout {
-                id: contorlButtons
+                id: contorlLeftButtons
                 height: parent.height
                 spacing: 0
                 LingmoIconButton {
@@ -103,27 +104,151 @@ LingmoObject {
             LingmoTextBox{
                 id: urlLine
                 text: web_tabView.currentItem.url
-                anchors.left: contorlButtons.right 
-                anchors.right: btn_more.left
+                anchors.left: contorlLeftButtons.right 
+                anchors.right: contorlRightButtons.left
                 cleanEnabled: false
                 height: parent.height
             }
-            LingmoIconButton {
-                id: btn_more
-                width: 40
-                height: 30
-                padding: 0
-                verticalPadding: 0
-                horizontalPadding: 0
-                rightPadding: 2
-                iconSource: LingmoIcons.More
-                Layout.alignment: Qt.AlignVCenter
-                iconSize: 15
-                text: qsTr('More')
-                radius: LingmoUnits.windowRadius
+            RowLayout {
+                id: contorlRightButtons
                 anchors.right: parent.right
-                onClicked: {
-                    more_menu.open()
+                height: parent.height
+                spacing: 0
+                LingmoIconButton {
+                    id: btn_collections
+                    Layout.preferredWidth: 40
+                    Layout.preferredHeight: 30
+                    padding: 0
+                    verticalPadding: 0
+                    horizontalPadding: 0
+                    rightPadding: 2
+                    iconSource: LingmoIcons.FavoriteList
+                    Layout.alignment: Qt.AlignVCenter
+                    iconSize: 15
+                    text: qsTr('Collections')
+                    radius: LingmoUnits.windowRadius
+                    onClicked: {
+                        more_menu.open()
+                    }
+                }
+                LingmoIconButton {
+                    id: btn_history
+                    Layout.preferredWidth: 40
+                    Layout.preferredHeight: 30
+                    padding: 0
+                    verticalPadding: 0
+                    horizontalPadding: 0
+                    rightPadding: 2
+                    iconSource: LingmoIcons.History
+                    Layout.alignment: Qt.AlignVCenter
+                    iconSize: 15
+                    text: qsTr('History')
+                    radius: LingmoUnits.windowRadius
+                    onClicked: {
+                        more_menu.open()
+                    }
+                }
+                LingmoIconButton {
+                    id: btn_download
+                    Layout.preferredWidth: 40
+                    Layout.preferredHeight: 30
+                    padding: 0
+                    verticalPadding: 0
+                    horizontalPadding: 0
+                    rightPadding: 2
+                    iconSource: LingmoIcons.Download
+                    Layout.alignment: Qt.AlignVCenter
+                    iconSize: 15
+                    text: qsTr('Download')
+                    radius: LingmoUnits.windowRadius
+                    onClicked: {
+                        more_menu.open()
+                    }
+                }
+                LingmoIconButton {
+                    id: btn_zoom
+                    Layout.preferredWidth: 40
+                    Layout.preferredHeight: 30
+                    padding: 0
+                    verticalPadding: 0
+                    horizontalPadding: 0
+                    rightPadding: 2
+                    iconSource: LingmoIcons.ZoomIn
+                    Layout.alignment: Qt.AlignVCenter
+                    iconSize: 15
+                    text: qsTr('Zoom')
+                    radius: LingmoUnits.windowRadius
+                    onClicked: {
+                        more_menu.open()
+                    }
+                }
+                LingmoIconButton {
+                    id: btn_find
+                    Layout.preferredWidth: 40
+                    Layout.preferredHeight: 30
+                    padding: 0
+                    verticalPadding: 0
+                    horizontalPadding: 0
+                    rightPadding: 2
+                    iconSource: LingmoIcons.Zoom
+                    Layout.alignment: Qt.AlignVCenter
+                    iconSize: 15
+                    text: qsTr('Find on Page')
+                    radius: LingmoUnits.windowRadius
+                    onClicked: {
+                        more_menu.open()
+                    }
+                }
+                LingmoIconButton {
+                    id: btn_screen_shot
+                    Layout.preferredWidth: 40
+                    Layout.preferredHeight: 30
+                    padding: 0
+                    verticalPadding: 0
+                    horizontalPadding: 0
+                    rightPadding: 2
+                    iconSource: LingmoIcons.Annotation
+                    Layout.alignment: Qt.AlignVCenter
+                    iconSize: 15
+                    text: qsTr('Screen Shot')
+                    radius: LingmoUnits.windowRadius
+                    onClicked: {
+                        more_menu.open()
+                    }
+                }
+                LingmoIconButton {
+                    id: btn_settings
+                    Layout.preferredWidth: 40
+                    Layout.preferredHeight: 30
+                    padding: 0
+                    verticalPadding: 0
+                    horizontalPadding: 0
+                    rightPadding: 2
+                    iconSource: LingmoIcons.Settings
+                    Layout.alignment: Qt.AlignVCenter
+                    iconSize: 15
+                    text: qsTr('Settings')
+                    radius: LingmoUnits.windowRadius
+                    onClicked: {
+                        more_menu.open()
+                    }
+                }
+                LingmoIconButton {
+                    id: btn_more
+                    Layout.preferredWidth: 40
+                    Layout.preferredHeight: 30
+                    padding: 0
+                    verticalPadding: 0
+                    horizontalPadding: 0
+                    rightPadding: 2
+                    iconSource: LingmoIcons.More
+                    Layout.alignment: Qt.AlignVCenter
+                    iconSize: 15
+                    text: qsTr('More')
+                    radius: LingmoUnits.windowRadius
+                    onClicked: {
+                        more_menu.open()
+                    }
                 }
             }
         }
@@ -141,31 +266,41 @@ LingmoObject {
                 anchors.fill: parent
                 url: argument.url
                 property bool is_fullscreen: false
-                onUrlChanged: {
-                    urlLine.text = url
-                }
-                onNewWindowRequested: function(request) {
-                    window.newTab(request.requestedUrl)
-                }
-                onTitleChanged:{
-                    web_tabView.setCurrentText(title);
-                }
-                onIconChanged:{
-                    var str=icon.toString()
-                    web_tabView.setCurrentTabIcon(str.replace("image://favicon/",""));
-                }
-                onWindowCloseRequested: {
-                    web_tabView.closeTab(web_tabView.currentIndex);
-                }
-                onLoadingChanged: {
-                    btn_reload.iconSource=loading ? LingmoIcons.Cancel : LingmoIcons.Refresh 
-                    btn_reload.text=loading ? qsTr('Cancel Reload') : qsTr('Reload')
+                onAuthenticationDialogRequested: {
+
                 }
                 onCanGoBackChanged: {
                     btn_back.enabled = canGoBack
                 }
                 onCanGoForwardChanged: {
                     btn_forward.enabled = canGoForward
+                }
+                onCertificateError:{
+
+                }
+                onColorDialogRequested: {
+
+                }
+                onContextMenuRequested: function(request) {
+                    request.accepted=true;
+                    context_menu.x=request.position.x;
+                    context_menu.y=request.position.y+60;
+                    context_menu.open();
+                }
+                onDesktopMediaRequested: {
+                    
+                }
+                onFeaturePermissionRequested: {
+
+                }
+                onFileDialogRequested: {
+
+                }
+                onFileSystemAccessRequested: {
+                    
+                }
+                onFindTextFinished: {
+
                 }
                 onFullScreenRequested: function(request){
                     if(!is_fullscreen){
@@ -182,8 +317,59 @@ LingmoObject {
                     }
                     request.accept();
                 }
-                onContextMenuRequested: {
-                    context_menu.open();
+                onGeometryChangeRequested: function(geometry){
+                    window.x = geometry.x;
+                    window.y = geometry.y-65;
+                    window.width = geometry.width;
+                    window.height = geometry.height+65;
+                }
+                onIconChanged:{
+                    var str=icon.toString()
+                    web_tabView.setCurrentTabIcon(str.replace("image://favicon/",""));
+                }
+                onJavaScriptDialogRequested: {
+
+                }
+                onLoadingChanged: {
+                    btn_reload.iconSource=loading ? LingmoIcons.Cancel : LingmoIcons.Refresh 
+                    btn_reload.text=loading ? qsTr('Cancel Reload') : qsTr('Reload')
+                }
+                onNavigationRequested: {
+
+                }
+                onNewWindowRequested: function(request) {
+                    window.newTab(request.requestedUrl)
+                }
+                onPrintRequested: {
+
+                }
+                onQuotaRequested: {
+
+                }
+                onRegisterProtocolHandlerRequested: {
+
+                }
+                onTitleChanged:{
+                    web_tabView.setCurrentText(title);
+                }
+                onTooltipRequested: function(request){
+                    request.accepted=true;
+                    toolTip.x=request.x;
+                    toolTip.y=request.y+35;
+                    toolTip.text=request.text;
+                    toolTip.requestType=request.type;
+                }
+                onUrlChanged: {
+                    urlLine.text = url
+                }
+                onWebAuthUxRequested: {
+                    
+                }
+                onWindowCloseRequested: {
+                    web_tabView.closeTab(web_tabView.currentIndex);
+                }
+                onZoomFactorChanged: {
+                    
                 }
                 settings.pluginsEnabled: true
                 settings.fullScreenSupportEnabled: true
@@ -298,10 +484,39 @@ LingmoObject {
             LingmoMenuItem{
                 text: '1'
             }
+            LingmoMenuItem{
+                text: '1'
+            }
+            LingmoMenuItem{
+                text: '1'
+            }
+            LingmoMenuItem{
+                text: '1'
+            }
+            LingmoMenuItem{
+                text: '1'
+            }
+        }
+        LingmoTooltip{
+            id: toolTip
+            property var requestType: TooltipRequest.Hide
+            visible: requestType==TooltipRequest.Show
         }
         GlobalKeyHandler{
             id: global_key_handler
             objectName: "global_key_handler"
         }
+    }
+    FileDialog{
+        id: file_dialog
+        visible: false
+    }
+    FolderDialog{
+        id: folder_dialog
+        visible: false
+    }
+    ColorDialog{
+        id: color_dialog
+        visible: false
     }
 }

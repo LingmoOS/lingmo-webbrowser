@@ -1,4 +1,5 @@
 import sys
+import os
 from components import *
 import updRes
 import LingmoUIPy
@@ -9,6 +10,7 @@ if __name__ == "__main__":
     qmlRegisterType(GlobalKeyHandler,'org.lingmo.webbrowser',1,0,'GlobalKeyHandler')
     QtWebEngineQuick.initialize()
     engine = QQmlApplicationEngine()
+    engine.addImportPath(os.getcwd()+'/../resources/qml')
     engine.load('qrc:/qml/main.qml')
     if not engine.rootObjects():
         sys.exit(-1)

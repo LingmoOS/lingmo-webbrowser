@@ -5,6 +5,7 @@ import QtQuick.Dialogs
 import QtWebEngine
 import LingmoUI
 import org.lingmo.webbrowser
+import pages
 
 LingmoObject {
     id: root
@@ -183,6 +184,23 @@ LingmoObject {
                     }
                 }
                 LingmoIconButton {
+                    id: btn_translation
+                    Layout.preferredWidth: 40
+                    Layout.preferredHeight: 30
+                    padding: 0
+                    verticalPadding: 0
+                    horizontalPadding: 0
+                    rightPadding: 2
+                    iconSource: LingmoIcons.Characters
+                    Layout.alignment: Qt.AlignVCenter
+                    iconSize: 15
+                    text: qsTr('Translation')
+                    radius: LingmoUnits.windowRadius
+                    onClicked: {
+                        more_menu.open()
+                    }
+                }
+                LingmoIconButton {
                     id: btn_find
                     Layout.preferredWidth: 40
                     Layout.preferredHeight: 30
@@ -190,7 +208,7 @@ LingmoObject {
                     verticalPadding: 0
                     horizontalPadding: 0
                     rightPadding: 2
-                    iconSource: LingmoIcons.Zoom
+                    iconSource: LingmoIcons.SearchAndApps
                     Layout.alignment: Qt.AlignVCenter
                     iconSize: 15
                     text: qsTr('Find on Page')
@@ -293,8 +311,11 @@ LingmoObject {
                 onFeaturePermissionRequested: {
 
                 }
-                onFileDialogRequested: {
-
+                onFileDialogRequested: function(request) {
+                    request.accepted = true;
+                    file_dialog.accept.connect(request.dialogAccept);
+                    file_dialog.reject.connect(request.dialogReject);
+                    file_dialog.visible = true;
                 }
                 onFileSystemAccessRequested: {
                     
@@ -327,6 +348,10 @@ LingmoObject {
                     var str=icon.toString()
                     web_tabView.setCurrentTabIcon(str.replace("image://favicon/",""));
                 }
+                onLinkHovered: function(link){
+                    link_popup.visible=true;
+                    link_popup_text.text=link;
+                }
                 onJavaScriptDialogRequested: {
 
                 }
@@ -355,7 +380,7 @@ LingmoObject {
                 onTooltipRequested: function(request){
                     request.accepted=true;
                     toolTip.x=request.x;
-                    toolTip.y=request.y+35;
+                    toolTip.y=request.y+30;
                     toolTip.text=request.text;
                     toolTip.requestType=request.type;
                 }
@@ -478,6 +503,9 @@ LingmoObject {
             LingmoMenuItem{
                 text: '1'
             }
+            LingmoDivider{
+                orientation: Qt.Horizontal
+            }
             LingmoMenuItem{
                 text: '1'
             }
@@ -502,6 +530,19 @@ LingmoObject {
             property var requestType: TooltipRequest.Hide
             visible: requestType==TooltipRequest.Show
         }
+        Rectangle{
+            id: link_popup
+            visible: false
+            width: link_popup_text.width+10
+            height: link_popup_text.height+10
+            color: LingmoTheme.dark ? Qt.rgba(50 / 255, 49 / 255, 48 / 255,1) : Qt.rgba(1, 1, 1, 1)
+            radius: LingmoUnits.smallRadius
+            anchors.bottom: parent.bottom
+            LingmoText{
+                id: link_popup_text
+                anchors.centerIn: parent
+            }
+        }
         GlobalKeyHandler{
             id: global_key_handler
             objectName: "global_key_handler"
@@ -519,4 +560,5 @@ LingmoObject {
         id: color_dialog
         visible: false
     }
+
 }

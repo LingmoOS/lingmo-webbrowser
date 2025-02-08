@@ -12,11 +12,7 @@ LingmoWindow{
     id: window
     visible: true
     property string config: {
-        var request = new XMLHttpRequest();
-        request.open("GET", 'file://../../../conf/main.conf', false); 
-        request.send(null);
-        print(request.responseText);
-        return request.responseText;
+        return undefined
     }
     property string home_url: 'https://bing.com'
     property point window_point

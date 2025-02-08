@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Dialogs
+import QtQml
 import QtWebEngine
 import LingmoUI
 import org.lingmo.webbrowser
@@ -12,12 +13,13 @@ LingmoWindow{
     visible: true
     property string config: {
         var request = new XMLHttpRequest();
-        request.open("GET", 'file://../../conf/main.conf', false); 
+        request.open("GET", 'file://../../../conf/main.conf', false); 
         request.send(null);
+        print(request.responseText);
         return request.responseText;
     }
     property string home_url: 'https://bing.com'
-    property point window_point: undefined
+    property point window_point
     property size window_size: Qt.size(1000,600)
     width: window_size.width
     height: window_size.height

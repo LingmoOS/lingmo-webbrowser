@@ -10,9 +10,6 @@ import pages
 LingmoWindow{
     id: window
     visible: true
-    width: 1000
-    height: 600
-    showDark: true
     property string config: {
         var request = new XMLHttpRequest();
         request.open("GET", 'file://../../conf/main.conf', false); 
@@ -20,6 +17,10 @@ LingmoWindow{
         return request.responseText;
     }
     property string home_url: 'https://bing.com'
+    property point window_point: undefined
+    property size window_size: Qt.size(1000,600)
+    width: window_size.width
+    height: window_size.height
     property int webViewId: 0
     property FileDialog fileDialog
     property FolderDialog folderDialog
@@ -310,22 +311,28 @@ LingmoWindow{
                 request.accepted = true;
                 switch(request.mode){
                     case FileDialogRequest.FileModeOpen: {
-                        fileDialog.accepted.connect(request.dialogAccept);
+                        fileDialog.fileMode=FileDialog.OpenFile
+                        fileDialog.nameFilters=request.acceptedMimeTypes
+                        fileDialog.accepted.connect(function(){request.dialogAccept(fileDialog.selectedFiles)});
                         fileDialog.rejected.connect(request.dialogReject);
                         fileDialog.visible = true;
                     }
                     case FileDialogRequest.FileModeOpenMultiple: {
-                        fileDialog.accepted.connect(request.dialogAccept);
+                        fileDialog.fileMode=FileDialog.OpenFiles
+                        fileDialog.nameFilters=request.acceptedMimeTypes
+                        fileDialog.accepted.connect(function(){request.dialogAccept(fileDialog.selectedFiles)});
                         fileDialog.rejected.connect(request.dialogReject);
                         fileDialog.visible = true;
                     }
                     case FileDialogRequest.FileModeUploadFolder: {
-                        forderDialog.accepted.connect(request.dialogAccept);
+                        folderDialog.accepted.connect(function(){request.dialogAccept(folderDialog.selectedFolder)});
                         forderDialog.rejected.connect(request.dialogReject);
                         forderDialog.visible = true;
                     }
                     case FileDialogRequest.FileModeSave: {
-                        fileDialog.accepted.connect(request.dialogAccept);
+                        fileDialog.fileMode=FileDialog.SaveFile
+                        fileDialog.nameFilters=request.acceptedMimeTypes
+                        fileDialog.accepted.connect(function(){request.dialogAccept(fileDialog.selectedFiles)});
                         fileDialog.rejected.connect(request.dialogReject);
                         fileDialog.visible = true;
                     }

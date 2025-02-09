@@ -19,6 +19,7 @@ LingmoObject {
         fileDialog: file_dialog
         folderDialog: folder_dialog
         colorDialog: color_dialog
+        // jsonHandler: json_handler
     }
     FileDialog{
         id: file_dialog
@@ -32,4 +33,8 @@ LingmoObject {
         id: color_dialog
         visible: false
     }
+    // JsonHandler{
+    //     id: json_handler
+    //     sourceFilePath: "../resources/data/settings.json"
+    // }
 }

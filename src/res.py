@@ -6,7 +6,7 @@
 from PySide6 import QtCore
 
 qt_resource_data = b"\
-\x00\x00\x03&\
+\x00\x00\x03\xc6\
 i\
 mport QtQuick\x0d\x0ai\
 mport QtQuick.Co\
@@ -43,21 +43,31 @@ log: file_dialog\
 Dialog: folder_d\
 ialog\x0d\x0a        c\
 olorDialog: colo\
-r_dialog\x0d\x0a    }\x0d\
-\x0a    FileDialog{\
-\x0d\x0a        id: fi\
-le_dialog\x0d\x0a     \
-   visible: fals\
-e\x0d\x0a    }\x0d\x0a    Fo\
-lderDialog{\x0d\x0a   \
-     id: folder_\
-dialog\x0d\x0a        \
-visible: false\x0d\x0a\
-    }\x0d\x0a    Color\
-Dialog{\x0d\x0a       \
- id: color_dialo\
-g\x0d\x0a        visib\
-le: false\x0d\x0a    }\
+r_dialog\x0d\x0a      \
+  // jsonHandler\
+: json_handler\x0d\x0a\
+    }\x0d\x0a    FileD\
+ialog{\x0d\x0a        \
+id: file_dialog\x0d\
+\x0a        visible\
+: false\x0d\x0a    }\x0d\x0a\
+    FolderDialog\
+{\x0d\x0a        id: f\
+older_dialog\x0d\x0a  \
+      visible: f\
+alse\x0d\x0a    }\x0d\x0a   \
+ ColorDialog{\x0d\x0a \
+       id: color\
+_dialog\x0d\x0a       \
+ visible: false\x0d\
+\x0a    }\x0d\x0a    // J\
+sonHandler{\x0d\x0a   \
+ //     id: json\
+_handler\x0d\x0a    //\
+     sourceFileP\
+ath: \x22../resourc\
+es/data/settings\
+.json\x22\x0d\x0a    // }\
 \x0d\x0a}\x0d\x0a\
 "
 
@@ -78,7 +88,7 @@ qt_resource_struct = b"\
 \x00\x00\x00\x00\x00\x02\x00\x00\x00\x01\x00\x00\x00\x02\
 \x00\x00\x00\x00\x00\x00\x00\x00\
 \x00\x00\x00\x0c\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\
-\x00\x00\x01\x94\xe4\x1aw\xbb\
+\x00\x00\x01\x94\xe9\xd8\xb2\x04\
 "
 
 def qInitResources():

@@ -11,19 +11,16 @@ import pages
 LingmoWindow{
     id: window
     visible: true
-    property string config: {
-        return undefined
-    }
-    property string home_url: 'https://bing.com'
-    property point window_point
-    property size window_size: Qt.size(1000,600)
-    width: window_size.width
-    height: window_size.height
+    width: 1000
+    height: 600
+    property string home_url: "https://lingmo.org"
     property int webViewId: 0
     property FileDialog fileDialog
     property FolderDialog folderDialog
     property ColorDialog colorDialog
+    // property JsonHandler jsonHandler
     function newTab(url= window.home_url){
+        print(url)
         web_tabView.appendTab("https://cn.bing.com/sa/simg/favicon-trans-bg-blue-mg-png.png",qsTr("New Tab"),com_webView,{"url": url,"id": webViewId},true);
         webViewId+=1;
     }
@@ -314,6 +311,7 @@ LingmoWindow{
                         fileDialog.accepted.connect(function(){request.dialogAccept(fileDialog.selectedFiles)});
                         fileDialog.rejected.connect(request.dialogReject);
                         fileDialog.visible = true;
+                        break;
                     }
                     case FileDialogRequest.FileModeOpenMultiple: {
                         fileDialog.fileMode=FileDialog.OpenFiles
@@ -321,11 +319,13 @@ LingmoWindow{
                         fileDialog.accepted.connect(function(){request.dialogAccept(fileDialog.selectedFiles)});
                         fileDialog.rejected.connect(request.dialogReject);
                         fileDialog.visible = true;
+                        break;
                     }
                     case FileDialogRequest.FileModeUploadFolder: {
                         folderDialog.accepted.connect(function(){request.dialogAccept(folderDialog.selectedFolder)});
                         forderDialog.rejected.connect(request.dialogReject);
                         forderDialog.visible = true;
+                        break;
                     }
                     case FileDialogRequest.FileModeSave: {
                         fileDialog.fileMode=FileDialog.SaveFile
@@ -333,6 +333,7 @@ LingmoWindow{
                         fileDialog.accepted.connect(function(){request.dialogAccept(fileDialog.selectedFiles)});
                         fileDialog.rejected.connect(request.dialogReject);
                         fileDialog.visible = true;
+                        break;
                     }
                 }
             }
@@ -580,8 +581,7 @@ LingmoWindow{
     }
     Rectangle{
         id: link_popup
-        visible: false
-        width: link_popup_text.width+10
+        width: link_popup_text.width ? link_popup_text.width+10 : 0
         height: link_popup_text.height+10
         color: LingmoTheme.dark ? Qt.rgba(50 / 255, 49 / 255, 48 / 255,1) : Qt.rgba(1, 1, 1, 1)
         radius: LingmoUnits.smallRadius
@@ -590,6 +590,9 @@ LingmoWindow{
             id: link_popup_text
             anchors.centerIn: parent
         }
+    }
+    LingmoPopup{
+        id: zoom_popup
     }
     GlobalKeyHandler{
         id: global_key_handler

@@ -3,6 +3,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Dialogs
 import QtQml
+import QtCore
 import QtWebEngine
 import LingmoUI
 import org.lingmo.webbrowser
@@ -13,19 +14,21 @@ LingmoWindow{
     visible: true
     width: 1000
     height: 600
-    property string home_url: "https://lingmo.org"
     property int webViewId: 0
     property FileDialog fileDialog
     property FolderDialog folderDialog
     property ColorDialog colorDialog
-    // property JsonHandler jsonHandler
-    function newTab(url= window.home_url){
-        print(url)
+    property Item settingsData
+    signal newWindowRequested
+    function newTab(url= settingsData.homeUrl){
         web_tabView.appendTab("https://cn.bing.com/sa/simg/favicon-trans-bg-blue-mg-png.png",qsTr("New Tab"),com_webView,{"url": url,"id": webViewId},true);
         webViewId+=1;
     }
+    function isCurrentTab(tabId){
+        return tabId===web_tabView.currentItem.argument.id && window.active
+    }
     Component.onCompleted: {
-        newTab()
+        newTab();
     }
     Rectangle{
         id: toolArea
@@ -186,6 +189,23 @@ LingmoWindow{
                 Layout.alignment: Qt.AlignVCenter
                 iconSize: 15
                 text: qsTr('Translation')
+                radius: LingmoUnits.windowRadius
+                onClicked: {
+                    more_menu.open()
+                }
+            }
+            LingmoIconButton {
+                id: btn_extensions
+                Layout.preferredWidth: 40
+                Layout.preferredHeight: 30
+                padding: 0
+                verticalPadding: 0
+                horizontalPadding: 0
+                rightPadding: 2
+                iconSource: LingmoIcons.Puzzle
+                Layout.alignment: Qt.AlignVCenter
+                iconSize: 15
+                text: qsTr('Extensions')
                 radius: LingmoUnits.windowRadius
                 onClicked: {
                     more_menu.open()
@@ -379,38 +399,38 @@ LingmoWindow{
                 btn_reload.iconSource=loading ? LingmoIcons.Cancel : LingmoIcons.Refresh 
                 btn_reload.text=loading ? qsTr('Cancel Reload') : qsTr('Reload')
             }
-            onNavigationRequested: function(request){
-                switch(request.navigationType){
-                    case WebEngineNavigationRequest.LinkClickedNavigation: {
-                        print('Link Clicked Navigation');
-                        break;
-                    }
-                    case WebEngineNavigationRequest.TypedNavigation: {
-                        print('Typed Navigation');
-                        break;
-                    }
-                    case WebEngineNavigationRequest.FormSubmittedNavigation: {
-                        print('Form Submitted Navigation');
-                        break;
-                    }
-                    case WebEngineNavigationRequest.BackForwardNavigation: {
-                        print('Back/Forward Navigation');
-                        break;
-                    }
-                    case WebEngineNavigationRequest.ReloadNavigation: {
-                        print('Reload Navigation');
-                        break;
-                    }
-                    case WebEngineNavigationRequest.RedirectNavigation: {
-                        print('Redirect Navigation');
-                        break;
-                    }
-                    case WebEngineNavigationRequest.OtherNavigation: {
-                        print('Other Navigation');
-                        break;
-                    }
-                }
-            }
+            // onNavigationRequested: function(request){
+            //     switch(request.navigationType){
+            //         case WebEngineNavigationRequest.LinkClickedNavigation: {
+            //             print('Link Clicked Navigation');
+            //             break;
+            //         }
+            //         case WebEngineNavigationRequest.TypedNavigation: {
+            //             print('Typed Navigation');
+            //             break;
+            //         }
+            //         case WebEngineNavigationRequest.FormSubmittedNavigation: {
+            //             print('Form Submitted Navigation');
+            //             break;
+            //         }
+            //         case WebEngineNavigationRequest.BackForwardNavigation: {
+            //             print('Back/Forward Navigation');
+            //             break;
+            //         }
+            //         case WebEngineNavigationRequest.ReloadNavigation: {
+            //             print('Reload Navigation');
+            //             break;
+            //         }
+            //         case WebEngineNavigationRequest.RedirectNavigation: {
+            //             print('Redirect Navigation');
+            //             break;
+            //         }
+            //         case WebEngineNavigationRequest.OtherNavigation: {
+            //             print('Other Navigation');
+            //             break;
+            //         }
+            //     }
+            // }
             onNewWindowRequested: function(request) {
                 window.newTab(request.requestedUrl)
             }
@@ -449,21 +469,21 @@ LingmoWindow{
             settings.fullScreenSupportEnabled: true
             Connections{
                 target: btn_back
-                enabled: argument.id===web_tabView.currentItem.argument.id
+                enabled: window.isCurrentTab(argument.id) 
                 function onClicked() {
                     goBack()
                 }
             }
             Connections{
                 target: btn_forward
-                enabled: argument.id===web_tabView.currentItem.argument.id
+                enabled: window.isCurrentTab(argument.id)
                 function onClicked() {
                     goForward()
                 }
             }
             Connections{
                 target: btn_reload
-                enabled: argument.id===web_tabView.currentItem.argument.id
+                enabled: window.isCurrentTab(argument.id)
                 function onClicked() {
                     if(loading){
                         stop();
@@ -475,15 +495,15 @@ LingmoWindow{
             }
             Connections{
                 target: btn_home
-                enabled: argument.id===web_tabView.currentItem.argument.id
+                enabled: window.isCurrentTab(argument.id)
                 function onClicked() {
-                    argument.url=window.home_url;
-                    url=window.home_url;
+                    argument.url=settingsData.homeUrl;
+                    url=settingsData.homeUrl;
                 }
             }
             Connections{
                 target: urlLine
-                enabled: argument.id===web_tabView.currentItem.argument.id
+                enabled: window.isCurrentTab(argument.id)
                 function onCommit(text) {
                     argument.url=text;
                     url=text;
@@ -492,25 +512,25 @@ LingmoWindow{
             }
             Connections{
                 target: web_tabView
-                enabled: argument.id===web_tabView.currentItem.argument.id
+                enabled: window.isCurrentTab(argument.id)
                 function onCurrentIndexChanged(){
                     urlLine.text=url
                 }
             }
             Connections{
-                target: global_key_handler
-                enabled: argument.id===web_tabView.currentItem.argument.id
-                function onF11Pressed(){
+                target: hotkey_toggle_fullscreen
+                enabled: window.isCurrentTab(argument.id)
+                function onActivated(){
                     if(is_fullscreen){
-                        window.useSystemAppBar=false;
                         web_tabView.anchors.topMargin=30;
                         window.showNormal();
                         is_fullscreen=false;
                     }
                     else{
-                        window.useSystemAppBar=true;
                         web_tabView.anchors.topMargin=-35;
                         window.showFullScreen();
+                        window.y=-31;
+                        window.height+=31;
                         is_fullscreen=true;
                     }
                 }
@@ -525,20 +545,50 @@ LingmoWindow{
     }
     LingmoMenu{
         id: more_menu
+        width: 200
+        x: parent.width-width
+        y: 30
         LingmoMenuItem{
-            text: '1'
+            text: qsTr('Open New Window')
+            onClicked: {
+                window.newWindowRequested()
+            }
         }
         LingmoMenuItem{
-            text: '1'
+            text: qsTr('Open New Tab')
+            onClicked: {
+                window.newTab()
+            }
+        }
+        LingmoDivider{
+            orientation: Qt.Horizontal
         }
         LingmoMenuItem{
-            text: '1'
+            text: qsTr('Collections')
         }
         LingmoMenuItem{
-            text: '1'
+            text: qsTr('History')
         }
         LingmoMenuItem{
-            text: '1'
+            text: qsTr('Download')
+        }
+        LingmoMenuItem{
+            text: qsTr('Zoom')
+        }
+        LingmoMenuItem{
+            text: qsTr('Translations')
+        }
+        LingmoMenuItem{
+            text: qsTr('Extensions')
+        }
+        LingmoMenuItem{
+            text: qsTr('Find On Page')
+        }
+        LingmoMenuItem{
+            text: qsTr('Screen Shot')
+        }
+        LingmoMenuItem{
+            text: qsTr('Settings')
         }
     }
     LingmoMenu{
@@ -590,12 +640,18 @@ LingmoWindow{
             id: link_popup_text
             anchors.centerIn: parent
         }
+        Behavior on visible {
+            PropertyAnimation {
+                duration: 500
+            }
+        }
     }
     LingmoPopup{
         id: zoom_popup
     }
-    GlobalKeyHandler{
-        id: global_key_handler
-        objectName: "global_key_handler"
+    LingmoHotkey{
+        id: hotkey_toggle_fullscreen
+        name: qsTr("Toogle Full Screen")
+        sequence: "F11"
     }
 }

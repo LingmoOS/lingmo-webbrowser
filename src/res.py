@@ -6,7 +6,7 @@
 from PySide6 import QtCore
 
 qt_resource_data = b"\
-\x00\x00\x03\xc6\
+\x00\x00\x04\xd1\
 i\
 mport QtQuick\x0d\x0ai\
 mport QtQuick.Co\
@@ -35,17 +35,38 @@ bled = true;\x0d\x0a  \
       LingmoThem\
 e.darkMode = Lin\
 gmoThemeType.Dar\
-k;\x0d\x0a    }\x0d\x0a    L\
-ingmoWebWindow{\x0d\
-\x0a        fileDia\
-log: file_dialog\
-\x0d\x0a        folder\
-Dialog: folder_d\
-ialog\x0d\x0a        c\
-olorDialog: colo\
-r_dialog\x0d\x0a      \
-  // jsonHandler\
-: json_handler\x0d\x0a\
+k;\x0d\x0a        newW\
+indow()\x0d\x0a    }\x0d\x0a\
+    function new\
+Window(){\x0d\x0a     \
+   var new_windo\
+w=com_web_window\
+.createObject(nu\
+ll,{})\x0d\x0a        \
+new_window.show(\
+)\x0d\x0a    }\x0d\x0a    Co\
+mponent{\x0d\x0a      \
+  id: com_web_wi\
+ndow\x0d\x0a        Li\
+ngmoWebWindow{\x0d\x0a\
+            obje\
+ctName: \x22web_win\
+dow\x22\x0d\x0a          \
+  fileDialog: fi\
+le_dialog\x0d\x0a     \
+       folderDia\
+log: folder_dial\
+og\x0d\x0a            \
+colorDialog: col\
+or_dialog\x0d\x0a     \
+       settingsD\
+ata: settings_da\
+ta\x0d\x0a            \
+onNewWindowReque\
+sted: {\x0d\x0a       \
+         newWind\
+ow()\x0d\x0a          \
+  }\x0d\x0a        }\x0d\x0a\
     }\x0d\x0a    FileD\
 ialog{\x0d\x0a        \
 id: file_dialog\x0d\
@@ -60,15 +81,11 @@ alse\x0d\x0a    }\x0d\x0a   \
        id: color\
 _dialog\x0d\x0a       \
  visible: false\x0d\
-\x0a    }\x0d\x0a    // J\
-sonHandler{\x0d\x0a   \
- //     id: json\
-_handler\x0d\x0a    //\
-     sourceFileP\
-ath: \x22../resourc\
-es/data/settings\
-.json\x22\x0d\x0a    // }\
-\x0d\x0a}\x0d\x0a\
+\x0a    }\x0d\x0a    Sett\
+ingsData{\x0d\x0a     \
+   id: settings_\
+data\x0d\x0a    }\x0d\x0a}\x0d\x0a\
+\
 "
 
 qt_resource_name = b"\
@@ -88,7 +105,7 @@ qt_resource_struct = b"\
 \x00\x00\x00\x00\x00\x02\x00\x00\x00\x01\x00\x00\x00\x02\
 \x00\x00\x00\x00\x00\x00\x00\x00\
 \x00\x00\x00\x0c\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\
-\x00\x00\x01\x94\xe9\xd8\xb2\x04\
+\x00\x00\x01\x94\xf3\x9c\xa5E\
 "
 
 def qInitResources():

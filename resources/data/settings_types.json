@@ -1,0 +1,6 @@
+{
+    "homeUrl": "str",
+    "windowPos": "QPoint",
+    "windowSize": "QSize",
+    "maximized": "bool"
+}

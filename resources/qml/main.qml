@@ -14,12 +14,24 @@ LingmoObject {
         LingmoTheme.animationEnabled = true;
         LingmoTheme.blurBehindWindowEnabled = true;
         LingmoTheme.darkMode = LingmoThemeType.Dark;
+        newWindow()
     }
-    LingmoWebWindow{
-        fileDialog: file_dialog
-        folderDialog: folder_dialog
-        colorDialog: color_dialog
-        // jsonHandler: json_handler
+    function newWindow(){
+        var new_window=com_web_window.createObject(null,{})
+        new_window.show()
+    }
+    Component{
+        id: com_web_window
+        LingmoWebWindow{
+            objectName: "web_window"
+            fileDialog: file_dialog
+            folderDialog: folder_dialog
+            colorDialog: color_dialog
+            settingsData: settings_data
+            onNewWindowRequested: {
+                newWindow()
+            }
+        }
     }
     FileDialog{
         id: file_dialog
@@ -33,8 +45,7 @@ LingmoObject {
         id: color_dialog
         visible: false
     }
-    // JsonHandler{
-    //     id: json_handler
-    //     sourceFilePath: "../resources/data/settings.json"
-    // }
+    SettingsData{
+        id: settings_data
+    }
 }

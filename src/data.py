@@ -5,8 +5,6 @@ from PySide6.QtCore import*
 from PySide6.QtWebEngineQuick import *
 import json
 
-with open('../resources/data/settings_types.json','r',encoding='utf-8') as file:
-    types=json.load(file)
 with open('../resources/data/settings.json','r',encoding='utf-8') as file:
     data=json.load(file)
 def Data(i):
@@ -18,7 +16,7 @@ def dumpData(property,val):
 
 class SettingsData(QQuickItem):
     for i in data:
-        exec(i+'''=Property('''+types[i]+''',lambda self: Data(\''''+i+'''\'),lambda self,val: dumpData(\''''+i+'''\',val))''')
+        exec(i+'''=Property(type(Data(\''''+i+'''\')),lambda self: Data(\''''+i+'''\'),lambda self,val: dumpData(\''''+i+'''\',val))''')
     def __init__(self,parent=None):
         super().__init__(parent)
     

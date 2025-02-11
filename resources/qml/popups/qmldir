@@ -1,0 +1,8 @@
+module popups
+CollectionsPopup 1.0 CollectionsPopup.qml
+DownloadPopup 1.0 DownloadPopup.qml
+ExtensionPopup 1.0 ExtensionPopup.qml
+FindOnPagePopup 1.0 FindOnPagePopup.qml
+HistoryPopup 1.0 HistoryPopup.qml
+TranslationPopup 1.0 TranslationPopup.qml
+ZoomPopup 1.0 ZoomPopup.qml

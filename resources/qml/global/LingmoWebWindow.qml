@@ -8,6 +8,7 @@ import QtWebEngine
 import LingmoUI
 import org.lingmo.webbrowser
 import pages
+import popups
 
 LingmoWindow{
     id: window
@@ -21,7 +22,7 @@ LingmoWindow{
     property Item settingsData
     signal newWindowRequested
     function newTab(url= settingsData.homeUrl){
-        web_tabView.appendTab("https://cn.bing.com/sa/simg/favicon-trans-bg-blue-mg-png.png",qsTr("New Tab"),com_webView,{"url": url,"id": webViewId},true);
+        web_tabView.appendTab("qrc:/images/browser.svg",qsTr("New Tab"),com_webView,{"url": url,"id": webViewId},true);
         webViewId+=1;
     }
     function isCurrentTab(tabId){
@@ -157,7 +158,7 @@ LingmoWindow{
                 text: qsTr('Download')
                 radius: LingmoUnits.windowRadius
                 onClicked: {
-                    more_menu.open()
+                    download_popup.open()
                 }
             }
             LingmoIconButton {
@@ -357,7 +358,7 @@ LingmoWindow{
                     }
                 }
             }
-            onFileSystemAccessRequested: {
+            onFileSystemAccessRequested: function(request){
                 
             }
             onFindTextFinished: {
@@ -391,6 +392,9 @@ LingmoWindow{
             onLinkHovered: function(link){
                 link_popup.visible=true;
                 link_popup_text.text=link;
+            }
+            onJavaScriptConsoleMessage: {
+                
             }
             onJavaScriptDialogRequested: {
 
@@ -467,6 +471,9 @@ LingmoWindow{
             }
             settings.pluginsEnabled: true
             settings.fullScreenSupportEnabled: true
+            profile.onDownloadRequested: function(request){
+                
+            }
             Connections{
                 target: btn_back
                 enabled: window.isCurrentTab(argument.id) 
@@ -550,12 +557,14 @@ LingmoWindow{
         y: 30
         LingmoMenuItem{
             text: qsTr('Open New Window')
+            iconSource: LingmoIcons.FuzzyReading
             onClicked: {
                 window.newWindowRequested()
             }
         }
         LingmoMenuItem{
             text: qsTr('Open New Tab')
+            iconSource: LingmoIcons.OpenPane
             onClicked: {
                 window.newTab()
             }
@@ -565,30 +574,39 @@ LingmoWindow{
         }
         LingmoMenuItem{
             text: qsTr('Collections')
+            iconSource: LingmoIcons.FavoriteList
         }
         LingmoMenuItem{
             text: qsTr('History')
+            iconSource: LingmoIcons.History
         }
         LingmoMenuItem{
             text: qsTr('Download')
+            iconSource: LingmoIcons.Download
         }
         LingmoMenuItem{
             text: qsTr('Zoom')
+            iconSource: LingmoIcons.ZoomIn
         }
         LingmoMenuItem{
             text: qsTr('Translations')
+            iconSource: LingmoIcons.Characters
         }
         LingmoMenuItem{
             text: qsTr('Extensions')
+            iconSource: LingmoIcons.Puzzle
         }
         LingmoMenuItem{
             text: qsTr('Find On Page')
+            iconSource: LingmoIcons.SearchAndApps
         }
         LingmoMenuItem{
             text: qsTr('Screen Shot')
+            iconSource: LingmoIcons.Annotation
         }
         LingmoMenuItem{
             text: qsTr('Settings')
+            iconSource: LingmoIcons.Settings
         }
     }
     LingmoMenu{
@@ -646,7 +664,22 @@ LingmoWindow{
             }
         }
     }
-    LingmoPopup{
+    CollectionsPopup{
+        id: collections_popup
+    }
+    DownloadPopup{
+        id: download_popup
+    }
+    ExtensionPopup{
+        id: extension_popup
+    }
+    FindOnPagePopup{
+        id: find_on_page_popup
+    }
+    HistoryPopup{
+        id: history_popup
+    }
+    ZoomPopup{
         id: zoom_popup
     }
     LingmoHotkey{

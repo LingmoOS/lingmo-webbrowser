@@ -1,7 +1,7 @@
 import sys
 import os
 from handlers import *
-from settings import SettingsData
+from data import SettingsData
 import updRes
 import LingmoUIPy
 import res

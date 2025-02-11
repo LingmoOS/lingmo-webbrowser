@@ -13,7 +13,7 @@ LingmoObject {
         LingmoApp.init(root, Qt.locale("zh_CN"));
         LingmoTheme.animationEnabled = true;
         LingmoTheme.blurBehindWindowEnabled = true;
-        LingmoTheme.darkMode = LingmoThemeType.Dark;
+        LingmoTheme.darkMode = LingmoThemeType.System;
         newWindow()
     }
     function newWindow(){

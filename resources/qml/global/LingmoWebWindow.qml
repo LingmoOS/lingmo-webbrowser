@@ -30,6 +30,9 @@ LingmoWindow{
     }
     Component.onCompleted: {
         newTab();
+        if(settingsData.downloadPath==="undefined"){
+            settingsData.downloadPath=StandardPaths.writableLocation(StandardPaths.DownloadLocation).toString().replace("file:///", "");
+        }
     }
     Rectangle{
         id: toolArea
@@ -124,7 +127,7 @@ LingmoWindow{
                 text: qsTr('Collections')
                 radius: LingmoUnits.windowRadius
                 onClicked: {
-                    more_menu.open()
+                    collections_popup.open()
                 }
             }
             LingmoIconButton {
@@ -141,7 +144,7 @@ LingmoWindow{
                 text: qsTr('History')
                 radius: LingmoUnits.windowRadius
                 onClicked: {
-                    more_menu.open()
+                    history_popup.open()
                 }
             }
             LingmoIconButton {
@@ -175,7 +178,7 @@ LingmoWindow{
                 text: qsTr('Zoom')
                 radius: LingmoUnits.windowRadius
                 onClicked: {
-                    more_menu.open()
+                    zoom_popup.open()
                 }
             }
             LingmoIconButton {
@@ -192,7 +195,7 @@ LingmoWindow{
                 text: qsTr('Translation')
                 radius: LingmoUnits.windowRadius
                 onClicked: {
-                    more_menu.open()
+                    translation_popup.open()
                 }
             }
             LingmoIconButton {
@@ -226,7 +229,7 @@ LingmoWindow{
                 text: qsTr('Find on Page')
                 radius: LingmoUnits.windowRadius
                 onClicked: {
-                    more_menu.open()
+                    find_on_page_popup.open()
                 }
             }
             LingmoIconButton {
@@ -359,10 +362,10 @@ LingmoWindow{
                 }
             }
             onFileSystemAccessRequested: function(request){
-                
+                request.accept();
             }
             onFindTextFinished: {
-
+                
             }
             onFullScreenRequested: function(request){
                 if(!is_fullscreen){
@@ -471,6 +474,8 @@ LingmoWindow{
             }
             settings.pluginsEnabled: true
             settings.fullScreenSupportEnabled: true
+            profile.offTheRecord: false
+            settings.localStorageEnabled: true
             profile.onDownloadRequested: function(request){
                 
             }
@@ -547,6 +552,10 @@ LingmoWindow{
                 btn_forward.enabled = canGoForward;
                 btn_reload.iconSource=loading ? LingmoIcons.Cancel : LingmoIcons.Refresh ;
                 btn_reload.text=loading ? qsTr('Cancel Reload') : qsTr('Reload');
+                profile.persistentStoragePath="E:/lingmo-project/lingmo-webbrowser/resources/data/storage"
+            }
+            Component.onDestruction: {
+                runJavaScript("localStorage",function(res){console.log(res);});
             }
         }
     }
@@ -678,6 +687,9 @@ LingmoWindow{
     }
     HistoryPopup{
         id: history_popup
+    }
+    TranslationPopup{
+        id: translation_popup
     }
     ZoomPopup{
         id: zoom_popup

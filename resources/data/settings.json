@@ -1,5 +1,12 @@
 {
     "homeUrl": "https://bing.com",
-    "windowPos": "undefined",
-    "windowSize": "undefined"
+    "windowPos": [
+        0,
+        0
+    ],
+    "windowSize": [
+        -1,
+        -1
+    ],
+    "downloadPath": "C:/Users/\u4e50\u4e50/Downloads"
 }

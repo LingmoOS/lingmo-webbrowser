@@ -12,11 +12,11 @@ def Data(i):
 def dumpData(property,val):
     data[property]=val
     with open('../resources/data/settings.json','w',encoding='utf-8') as file:
-        json.dump(data,file)
+        json.dump(data,file,indent=4)
 
 class SettingsData(QQuickItem):
     for i in data:
-        exec(i+'''=Property(type(Data(\''''+i+'''\')),lambda self: Data(\''''+i+'''\'),lambda self,val: dumpData(\''''+i+'''\',val))''')
+        exec(i+'''=Property(type(Data(\''''+i+'''\')),(lambda self: Data(\''''+i+'''\')),(lambda self,val: dumpData(\''''+i+'''\',val)))''')
     def __init__(self,parent=None):
         super().__init__(parent)
     

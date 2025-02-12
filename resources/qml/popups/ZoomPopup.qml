@@ -8,8 +8,8 @@ import LingmoUI
 
 LingmoPopup{
     id: popup
-    width: 600
-    height: 400
+    width: 200
+    height: 40
     modal: false
     closePolicy: LingmoPopup.CloseOnPressOutside
 }

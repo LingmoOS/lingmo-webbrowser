@@ -389,7 +389,7 @@ LingmoWindow{
                 window.height = geometry.height+65;
             }
             onIconChanged:{
-                var str=icon.toString()
+                var str=icon.toString();
                 web_tabView.setCurrentTabIcon(str.replace("image://favicon/",""));
             }
             onLinkHovered: function(link){
@@ -501,7 +501,7 @@ LingmoWindow{
                         stop();
                     }
                     else{
-                        reload()
+                        reload();
                     }
                 }
             }
@@ -552,7 +552,7 @@ LingmoWindow{
                 btn_forward.enabled = canGoForward;
                 btn_reload.iconSource=loading ? LingmoIcons.Cancel : LingmoIcons.Refresh ;
                 btn_reload.text=loading ? qsTr('Cancel Reload') : qsTr('Reload');
-                profile.persistentStoragePath="E:/lingmo-project/lingmo-webbrowser/resources/data/storage"
+                profile.persistentStoragePath="../../data/storage"
             }
             Component.onDestruction: {
                 runJavaScript("localStorage",function(res){console.log(res);});

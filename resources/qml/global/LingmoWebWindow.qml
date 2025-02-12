@@ -552,10 +552,7 @@ LingmoWindow{
                 btn_forward.enabled = canGoForward;
                 btn_reload.iconSource=loading ? LingmoIcons.Cancel : LingmoIcons.Refresh ;
                 btn_reload.text=loading ? qsTr('Cancel Reload') : qsTr('Reload');
-                profile.persistentStoragePath="../../data/storage"
-            }
-            Component.onDestruction: {
-                runJavaScript("localStorage",function(res){console.log(res);});
+                profile.persistentStoragePath=Qt.resolvedUrl(".").toString().replace("qml/global","data/storage").replace("file:///","");
             }
         }
     }

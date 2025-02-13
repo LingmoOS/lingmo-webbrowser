@@ -20,14 +20,15 @@ LingmoObject {
         var new_window=com_web_window.createObject(null,{})
         new_window.show()
     }
+    property list<WebEngineDownloadRequest> download_requests;
     Component{
         id: com_web_window
         LingmoWebWindow{
-            objectName: "web_window"
             fileDialog: file_dialog
             folderDialog: folder_dialog
             colorDialog: color_dialog
             settingsData: settings_data
+            downloadRequests: download_requests
             onNewWindowRequested: {
                 newWindow()
             }

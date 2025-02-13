@@ -20,6 +20,7 @@ LingmoWindow{
     property FolderDialog folderDialog
     property ColorDialog colorDialog
     property Item settingsData
+    property list<WebEngineDownloadRequest> downloadRequests
     signal newWindowRequested
     function newTab(url= settingsData.homeUrl){
         web_tabView.appendTab("qrc:/images/browser.svg",qsTr("New Tab"),com_webView,{"url": url,"id": webViewId},true);
@@ -439,7 +440,7 @@ LingmoWindow{
             //     }
             // }
             onNewWindowRequested: function(request) {
-                window.newTab(request.requestedUrl)
+                window.newTab(request.requestedUrl);
             }
             onPrintRequested: {
 

@@ -16,7 +16,8 @@ def dumpData(property,val):
 
 class SettingsData(QQuickItem):
     for i in data:
-        exec(i+'''=Property(type(Data(\''''+i+'''\')),(lambda self: Data(\''''+i+'''\')),(lambda self,val: dumpData(\''''+i+'''\',val)))''')
+        exec(i+"Changed=Signal(type(Data(\'"+i+"\')))")
+        exec(i+'''=Property(type(Data(\''''+i+'''\')),(lambda self: Data(\''''+i+'''\')),(lambda self,val: dumpData(\''''+i+'''\',val)),notify='''+i+'''Changed)''')
     def __init__(self,parent=None):
         super().__init__(parent)
     

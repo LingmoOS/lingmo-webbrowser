@@ -312,8 +312,11 @@ LingmoWindow{
             onCertificateError:{
 
             }
-            onColorDialogRequested: {
-
+            onColorDialogRequested: function(request){
+                request.accepted=true;
+                colorDialog.accepted.connect(function(){request.dialogAccept(colorDialog.selectedColor)})
+                colorDialog.rejected.connect(request.dialogReject)
+                colorDialog.visible = true;
             }
             onContextMenuRequested: function(request) {
                 request.accepted=true;
@@ -476,9 +479,11 @@ LingmoWindow{
             settings.pluginsEnabled: true
             settings.fullScreenSupportEnabled: true
             profile.offTheRecord: false
+            profile.downloadPath: {return settingsData.downloadPath}
             settings.localStorageEnabled: true
             profile.onDownloadRequested: function(request){
-                
+                downloadRequests.push(request)
+                request.accept();
             }
             Connections{
                 target: btn_back
@@ -676,6 +681,7 @@ LingmoWindow{
     }
     DownloadPopup{
         id: download_popup
+        parentWindow: window
     }
     ExtensionPopup{
         id: extension_popup

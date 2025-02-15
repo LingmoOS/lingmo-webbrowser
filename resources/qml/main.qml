@@ -20,7 +20,9 @@ LingmoObject {
         var new_window=com_web_window.createObject(null,{})
         new_window.show()
     }
-    property list<WebEngineDownloadRequest> download_requests;
+    ListModel{
+        id: download_requests
+    }
     Component{
         id: com_web_window
         LingmoWebWindow{

@@ -20,10 +20,30 @@ LingmoWindow{
     property FolderDialog folderDialog
     property ColorDialog colorDialog
     property Item settingsData
-    property list<WebEngineDownloadRequest> downloadRequests
+    property ListModel downloadRequests
     signal newWindowRequested
+    function getSpecialTitle(url){
+        if(url=="browser://downloads"){
+            return "Downloads"
+        }
+        else if(url=="browser://extensions"){
+            return "Extensions"
+        }
+        else if(url=="browser://history"){
+            return "History"
+        }
+        else if(url=="browser://settings"){
+            return "Settings"
+        }
+        else if(url=="browser://start"){
+            return "Start Page"
+        }
+        else{
+            return "New Tab"
+        }
+    }
     function newTab(url= settingsData.homeUrl){
-        web_tabView.appendTab("qrc:/images/browser.svg",qsTr("New Tab"),com_webView,{"url": url,"id": webViewId},true);
+        web_tabView.appendTab("qrc:/images/browser.svg",qsTr(getSpecialTitle(url)),com_webView,{"url": url,"id": webViewId},true);
         webViewId+=1;
     }
     function isCurrentTab(tabId){
@@ -213,7 +233,7 @@ LingmoWindow{
                 text: qsTr('Extensions')
                 radius: LingmoUnits.windowRadius
                 onClicked: {
-                    more_menu.open()
+                    extension_popup.open()
                 }
             }
             LingmoIconButton {
@@ -234,23 +254,6 @@ LingmoWindow{
                 }
             }
             LingmoIconButton {
-                id: btn_screen_shot
-                Layout.preferredWidth: 40
-                Layout.preferredHeight: 30
-                padding: 0
-                verticalPadding: 0
-                horizontalPadding: 0
-                rightPadding: 2
-                iconSource: LingmoIcons.Annotation
-                Layout.alignment: Qt.AlignVCenter
-                iconSize: 15
-                text: qsTr('Screen Shot')
-                radius: LingmoUnits.windowRadius
-                onClicked: {
-                    more_menu.open()
-                }
-            }
-            LingmoIconButton {
                 id: btn_settings
                 Layout.preferredWidth: 40
                 Layout.preferredHeight: 30
@@ -264,7 +267,7 @@ LingmoWindow{
                 text: qsTr('Settings')
                 radius: LingmoUnits.windowRadius
                 onClicked: {
-                    more_menu.open()
+                    window.newTab("browser://settings")
                 }
             }
             LingmoIconButton {
@@ -409,6 +412,9 @@ LingmoWindow{
             onLoadingChanged: {
                 btn_reload.iconSource=loading ? LingmoIcons.Cancel : LingmoIcons.Refresh 
                 btn_reload.text=loading ? qsTr('Cancel Reload') : qsTr('Reload')
+                if(loading){
+                    web_tabView.setCurrentTabIcon("qrc:/images/browser.svg")
+                }
             }
             // onNavigationRequested: function(request){
             //     switch(request.navigationType){
@@ -482,7 +488,7 @@ LingmoWindow{
             profile.downloadPath: {return settingsData.downloadPath}
             settings.localStorageEnabled: true
             profile.onDownloadRequested: function(request){
-                downloadRequests.push(request)
+                downloadRequests.append({"request": request,"id": request.id})
                 request.accept();
             }
             Connections{
@@ -524,8 +530,14 @@ LingmoWindow{
                 enabled: window.isCurrentTab(argument.id)
                 function onCommit(text) {
                     argument.url=text;
-                    url=text;
+                    webView_.url=text;
                     forceActiveFocus();
+                    download_page.visible=(webView_.url=="browser://downloads");
+                    extension_page.visible=(webView_.url=="browser://extensions");
+                    history_page.visible=(webView_.url=="browser://history");
+                    settings_page.visible=(webView_.url=="browser://settings");
+                    start_page.visible=(webView_.url=="browser://start");
+                    web_tabView.setCurrentText(window.getSpecialTitle(text))
                 }
             }
             Connections{
@@ -560,6 +572,31 @@ LingmoWindow{
                 btn_reload.text=loading ? qsTr('Cancel Reload') : qsTr('Reload');
                 profile.persistentStoragePath=Qt.resolvedUrl(".").toString().replace("qml/global","data/storage").replace("file:///","");
             }
+            Downloads{
+                id: download_page
+                visible: argument.url=="browser://downloads"
+                z: 32767
+            }
+            Extensions{
+                id: extension_page
+                visible: argument.url=="browser://extensions"
+                z: 32767
+            }
+            History{
+                id: history_page
+                visible: argument.url=="browser://history"
+                z: 32767
+            }
+            Settings{
+                id: settings_page
+                visible: argument.url=="browser://settings"
+                z: 32767
+            }
+            StartPage{
+                id: start_page
+                visible: argument.url=="browser://start"
+                z: 32767
+            }
         }
     }
     LingmoMenu{
@@ -587,38 +624,58 @@ LingmoWindow{
         LingmoMenuItem{
             text: qsTr('Collections')
             iconSource: LingmoIcons.FavoriteList
+            onClicked: {
+                collections_popup.open()
+            }
         }
         LingmoMenuItem{
             text: qsTr('History')
             iconSource: LingmoIcons.History
+            onClicked: {
+                history_popup.open()
+            }
         }
         LingmoMenuItem{
             text: qsTr('Download')
             iconSource: LingmoIcons.Download
+            onClicked: {
+                download_popup.open()
+            }
         }
         LingmoMenuItem{
             text: qsTr('Zoom')
             iconSource: LingmoIcons.ZoomIn
+            onClicked: {
+                zoom_popup.open()
+            }
         }
         LingmoMenuItem{
             text: qsTr('Translations')
             iconSource: LingmoIcons.Characters
+            onClicked: {
+                translation_popup.open()
+            }
         }
         LingmoMenuItem{
             text: qsTr('Extensions')
             iconSource: LingmoIcons.Puzzle
+            onClicked: {
+                extension_popup.open()
+            }
         }
         LingmoMenuItem{
             text: qsTr('Find On Page')
             iconSource: LingmoIcons.SearchAndApps
-        }
-        LingmoMenuItem{
-            text: qsTr('Screen Shot')
-            iconSource: LingmoIcons.Annotation
+            onClicked: {
+                find_on_page_popup.open()
+            }
         }
         LingmoMenuItem{
             text: qsTr('Settings')
             iconSource: LingmoIcons.Settings
+            onClicked: {
+                window.newTab("browser://settings")
+            }
         }
     }
     LingmoMenu{
@@ -678,6 +735,7 @@ LingmoWindow{
     }
     CollectionsPopup{
         id: collections_popup
+        parentWindow: window
     }
     DownloadPopup{
         id: download_popup
@@ -685,18 +743,23 @@ LingmoWindow{
     }
     ExtensionPopup{
         id: extension_popup
+        parentWindow: window
     }
     FindOnPagePopup{
         id: find_on_page_popup
+        parentWindow: window
     }
     HistoryPopup{
         id: history_popup
+        parentWindow: window
     }
     TranslationPopup{
         id: translation_popup
+        parentWindow: window
     }
     ZoomPopup{
         id: zoom_popup
+        parentWindow: window
     }
     LingmoHotkey{
         id: hotkey_toggle_fullscreen

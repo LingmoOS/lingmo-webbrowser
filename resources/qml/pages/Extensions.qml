@@ -2,10 +2,17 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Dialogs
-import QtQml
-import QtCore
 import LingmoUI
 
-Item{
-    
+Rectangle{
+    id: rect
+    LingmoText{
+        id: heading
+        text: "Extensions"
+        font: LingmoTextStyle.Title
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.topMargin: 20
+        anchors.leftMargin: 20
+    }
 }

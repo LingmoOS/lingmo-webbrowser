@@ -6,6 +6,8 @@ import QtQml
 import QtCore
 import QtWebEngine
 import LingmoUI
+import Qt.labs.platform
+import org.lingmo.webbrowser
 
 LingmoPopup{
     id: popup
@@ -15,6 +17,8 @@ LingmoPopup{
     closePolicy: pinned ? LingmoPopup.CloseOnEscape : LingmoPopup.CloseOnEscape|LingmoPopup.CloseOnPressOutside
     property bool pinned: false
     property LingmoWindow parentWindow
+    property ListModel download_requests
+    property bool showHistory
     LingmoText{
         id: heading
         text: qsTr("Downloads")
@@ -46,8 +50,51 @@ LingmoPopup{
             iconSource: LingmoIcons.Cancel
             Layout.alignment: Qt.AlignVCenter
             onClicked: {
-                popup.close()
+                popup.close();
+                WebEngineDownloadRequest
             }
         }
     }
+    ListView{
+        id: download_requests_view
+        model: popup.download_requests
+        spacing: 5
+        anchors.top: heading.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        delegate: Rectangle{
+            height: 50
+            anchors.left: parent.left
+            anchors.right: parent.right
+            color: LingmoColor.Green.normal
+            RowLayout{
+                anchors.left: parent.left
+                Image{
+                    id: file_icon
+                    source: FileIconProvidingHandler.icon(model.request.downloadFileName)
+                }
+                ColumnLayout{
+                    LingmoText{
+                        text: model.request.downloadFileName
+                    }
+                    LingmoText{
+                        text: model.request.downloadFileName
+                    }
+                }
+            }
+            RowLayout{
+                anchors.right: parent.right
+                LingmoIconButton{
+                    id: pause_resume_button
+                }
+            }
+            Connections{
+                target: model.request
+                onDownloadCompleted: {
+                    file_icon.source=FileIconProvidingHandler.icon(model.request.downloadFileName);
+                }
+            }
+        }
+    }
+    
 }

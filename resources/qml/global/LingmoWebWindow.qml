@@ -19,7 +19,6 @@ LingmoWindow{
     property FileDialog fileDialog
     property FolderDialog folderDialog
     property ColorDialog colorDialog
-    property Item settingsData
     property ListModel downloadRequests
     signal newWindowRequested
     function getSpecialTitle(url){
@@ -42,7 +41,7 @@ LingmoWindow{
             return "New Tab"
         }
     }
-    function newTab(url= settingsData.homeUrl){
+    function newTab(url= SettingsData.homeUrl){
         web_tabView.appendTab("qrc:/images/browser.svg",qsTr(getSpecialTitle(url)),com_webView,{"url": url,"id": webViewId},true);
         webViewId+=1;
     }
@@ -51,8 +50,8 @@ LingmoWindow{
     }
     Component.onCompleted: {
         newTab();
-        if(settingsData.downloadPath==="undefined"){
-            settingsData.downloadPath=StandardPaths.writableLocation(StandardPaths.DownloadLocation).toString().replace("file:///", "");
+        if(SettingsData.downloadPath==="undefined"){
+            SettingsData.downloadPath=StandardPaths.writableLocation(StandardPaths.DownloadLocation).toString().replace("file:///", "");
         }
     }
     Rectangle{
@@ -485,11 +484,12 @@ LingmoWindow{
             settings.pluginsEnabled: true
             settings.fullScreenSupportEnabled: true
             profile.offTheRecord: false
-            profile.downloadPath: {return settingsData.downloadPath}
+            profile.downloadPath: {return SettingsData.downloadPath}
             settings.localStorageEnabled: true
             profile.onDownloadRequested: function(request){
-                downloadRequests.append({"request": request,"id": request.id})
+                window.downloadRequests.append({"request": request,"id": request.id})
                 request.accept();
+                download_popup.open();
             }
             Connections{
                 target: btn_back
@@ -521,8 +521,8 @@ LingmoWindow{
                 target: btn_home
                 enabled: window.isCurrentTab(argument.id)
                 function onClicked() {
-                    argument.url=settingsData.homeUrl;
-                    url=settingsData.homeUrl;
+                    argument.url=SettingsData.homeUrl;
+                    url=SettingsData.homeUrl;
                 }
             }
             Connections{
@@ -740,6 +740,7 @@ LingmoWindow{
     DownloadPopup{
         id: download_popup
         parentWindow: window
+        download_requests: window.downloadRequests
     }
     ExtensionPopup{
         id: extension_popup

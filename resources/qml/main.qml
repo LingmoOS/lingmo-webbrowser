@@ -29,7 +29,6 @@ LingmoObject {
             fileDialog: file_dialog
             folderDialog: folder_dialog
             colorDialog: color_dialog
-            settingsData: settings_data
             downloadRequests: download_requests
             onNewWindowRequested: {
                 newWindow()
@@ -47,8 +46,5 @@ LingmoObject {
     ColorDialog{
         id: color_dialog
         visible: false
-    }
-    SettingsData{
-        id: settings_data
     }
 }

@@ -487,7 +487,7 @@ LingmoWindow{
             profile.downloadPath: {return SettingsData.downloadPath}
             settings.localStorageEnabled: true
             profile.onDownloadRequested: function(request){
-                window.downloadRequests.append({"request": request,"id": request.id})
+                window.downloadRequests.append({"request": request,"id": request.id,"profile": profile})
                 request.accept();
                 download_popup.open();
             }
@@ -736,31 +736,45 @@ LingmoWindow{
     CollectionsPopup{
         id: collections_popup
         parentWindow: window
+        x: {return btn_collections.x+contorlRightButtons.x+btn_download.width-width}
+        y: {return window.appBar.height+toolArea.height}
     }
     DownloadPopup{
         id: download_popup
         parentWindow: window
         download_requests: window.downloadRequests
+        x: {return btn_download.x+contorlRightButtons.x+btn_download.width-width}
+        y: {return window.appBar.height+toolArea.height}
     }
     ExtensionPopup{
         id: extension_popup
         parentWindow: window
+        x: {return btn_extensions.x+contorlRightButtons.x+btn_download.width-width}
+        y: {return window.appBar.height+toolArea.height}
     }
     FindOnPagePopup{
         id: find_on_page_popup
         parentWindow: window
+        x: {return btn_find.x+contorlRightButtons.x+btn_download.width-width}
+        y: {return window.appBar.height+toolArea.height}
     }
     HistoryPopup{
         id: history_popup
         parentWindow: window
+        x: {return btn_history.x+contorlRightButtons.x+btn_download.width-width}
+        y: {return window.appBar.height+toolArea.height}
     }
     TranslationPopup{
         id: translation_popup
         parentWindow: window
+        x: {return btn_translation.x+contorlRightButtons.x+btn_download.width-width}
+        y: {return window.appBar.height+toolArea.height}
     }
     ZoomPopup{
         id: zoom_popup
         parentWindow: window
+        x: {return btn_zoom.x+contorlRightButtons.x+btn_download.width-width}
+        y: {return window.appBar.height+toolArea.height}
     }
     LingmoHotkey{
         id: hotkey_toggle_fullscreen

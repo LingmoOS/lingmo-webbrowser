@@ -33,6 +33,7 @@ LingmoPopup{
         anchors.right: parent.right
         LingmoIconButton{
             iconSource: LingmoIcons.NewWindow
+            text: "Open Downloads Page"
             Layout.alignment: Qt.AlignVCenter
             onClicked: {
                 popup.close();
@@ -41,6 +42,7 @@ LingmoPopup{
         }
         LingmoIconButton{
             iconSource: popup.pinned ? LingmoIcons.PinnedFill : LingmoIcons.Pin
+            text: popup.pinned ? "Cancel Stay On Top" : "Stay On Top"
             Layout.alignment: Qt.AlignVCenter
             onClicked: {
                 popup.pinned = !popup.pinned
@@ -48,6 +50,8 @@ LingmoPopup{
         }
         LingmoIconButton{
             iconSource: LingmoIcons.Cancel
+            text: "Close"
+            visible: popup.pinned
             Layout.alignment: Qt.AlignVCenter
             onClicked: {
                 popup.close();
@@ -62,39 +66,104 @@ LingmoPopup{
         anchors.top: heading.bottom
         anchors.left: parent.left
         anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        anchors.leftMargin: 20
+        anchors.rightMargin: 20
+        ScrollBar.vertical: LingmoScrollBar{}
         delegate: Rectangle{
-            height: 50
+            id: rect_delegate
+            height: 60
             anchors.left: parent.left
             anchors.right: parent.right
-            color: LingmoColor.Green.normal
+            property WebEngineDownloadRequest request: model.request
+            property bool cancelled: false
+            property bool deleted: false
             RowLayout{
                 anchors.left: parent.left
                 Image{
                     id: file_icon
-                    source: FileIconProvidingHandler.icon(model.request.downloadFileName)
+                    source: FileIconProvidingHandler.icon(request.downloadFileName)
                 }
                 ColumnLayout{
                     LingmoText{
-                        text: model.request.downloadFileName
+                        text: request.downloadFileName
+                    }
+                    ProgressBar{
+                        id: progress_bar
+                        from: 0
+                        value: request.receivedBytes
+                        to: request.totalBytes
+                        visible: {return !request.isFinished}
                     }
                     LingmoText{
-                        text: model.request.downloadFileName
+                        text: {
+                            if(rect_delegate.cancelled){
+                                return "Have Been Canceled"
+                            }
+                            if(rect_delegate.deleted){
+                                return "Have Been Deleted"
+                            }
+                            if(request.isFinished){
+                                return "Have Been Finished"
+                            }
+                            return request.receivedBytes.toString()+"B/"+request.totalBytes.toString();
+                        }
                     }
                 }
             }
             RowLayout{
+                id: tool_buttons
                 anchors.right: parent.right
                 LingmoIconButton{
-                    id: pause_resume_button
+                    id: pauseResume_openDirectory_button
+                    iconSource: request.isFinished ? LingmoIcons.OpenFolderHorizontal : (request.isPaused ? LingmoIcons.Play : LingmoIcons.Pause)
+                    visible: !rect_delegate.cancelled && !rect_delegate.deleted
+                    onClicked: {
+                        if(request.isFinished){
+                            FileManagerHandler.open(request.downloadDirectory)
+                        }
+                        else{
+                            if(request.isPaused){
+                                request.resume();
+                            }
+                            else{
+                                request.pause();
+                            }
+                        }
+                    }
+                }
+                LingmoIconButton{
+                    id: cancel_delete_button
+                    iconSource: request.isFinished ? LingmoIcons.Delete : LingmoIcons.Cancel
+                    visible: !rect_delegate.cancelled && !rect_delegate.deleted
+                    onClicked: {
+                        if(request.isFinished){
+                            FileManagerHandler.delete(request.downloadDirectory+"/"+request.downloadFileName)
+                            rect_delegate.deleted=true;
+                        }
+                        else{
+                            request.cancel()
+                            rect_delegate.cancelled=true;
+                        }
+                    }
                 }
             }
             Connections{
-                target: model.request
-                onDownloadCompleted: {
-                    file_icon.source=FileIconProvidingHandler.icon(model.request.downloadFileName);
+                target: model.profile
+                function onDownloadFinished(request_){
+                    if(request===request_){
+                        file_icon.source=FileIconProvidingHandler.icon(request.downloadFileName);
+                    }
+                }
+            }
+            Connections{
+                target: request
+                function onReceivedBytesChanged(){
+                    progress_bar.from=0;
+                    progress_bar.value=request.receivedBytes;
+                    progress_bar.to=request.totalBytes;
                 }
             }
         }
     }
-    
 }

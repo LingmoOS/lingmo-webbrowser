@@ -5,6 +5,7 @@ from PySide6.QtCore import*
 from PySide6.QtWebEngineQuick import *
 from PySide6.QtWebEngineCore import *
 from PySide6.QtNetwork import *
+import os
 
 class FileIconProvidingHandler(QQuickItem):
     def __init__(self):
@@ -14,10 +15,21 @@ class FileIconProvidingHandler(QQuickItem):
     def icon(self,path):
         fileInfo=QFileInfo(path)
         icon=self.fileIconHandler.icon(fileInfo)
-        image=icon.pixmap(128,128).toImage()
+        image=icon.pixmap(32,32).toImage()
         buffer = QBuffer()
         buffer.open(QBuffer.OpenModeFlag.WriteOnly)
         image.save(buffer,'PNG')
         base64String=buffer.data().toBase64()
         url=QUrl('data:image/png;base64,'+base64String)
         return url
+
+
+class FileManagerHandler(QQuickItem):
+    def __init__(self):
+        super().__init__()
+    @Slot(str)
+    def open(self,path):
+        QDesktopServices.openUrl(QUrl.fromLocalFile(path))
+    @Slot(str)
+    def delete(self,path):
+        os.remove(path)

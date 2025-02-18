@@ -10,6 +10,7 @@ if __name__ == "__main__":
     app = QGuiApplication(sys.argv)
     qmlRegisterSingletonType(SettingsData,'org.lingmo.webbrowser',1,0,'SettingsData')
     qmlRegisterSingletonType(FileIconProvidingHandler,'org.lingmo.webbrowser',1,0,'FileIconProvidingHandler')
+    qmlRegisterSingletonType(FileManagerHandler,'org.lingmo.webbrowser',1,0,'FileManagerHandler')
     QtWebEngineQuick.initialize()
     engine = QQmlApplicationEngine()
     engine.addImportPath(os.getcwd()+'/../resources/qml')

@@ -487,6 +487,9 @@ LingmoWindow{
             profile.downloadPath: {return SettingsData.downloadPath}
             settings.localStorageEnabled: true
             profile.onDownloadRequested: function(request){
+                for(var i=0;i<window.downloadRequests.count;i++){
+                    if(window.downloadRequests.get(i).id==request.id)return;
+                }
                 window.downloadRequests.append({"request": request,"id": request.id,"profile": profile})
                 request.accept();
                 download_popup.open();

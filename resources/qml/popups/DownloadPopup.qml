@@ -8,10 +8,11 @@ import QtWebEngine
 import LingmoUI
 import Qt.labs.platform
 import org.lingmo.webbrowser
+import QtQuick.Controls.LingmoStyle as QQCL
 
 LingmoPopup{
     id: popup
-    width: 600
+    width: 350
     height: 400
     modal: false
     closePolicy: pinned ? LingmoPopup.CloseOnEscape : LingmoPopup.CloseOnEscape|LingmoPopup.CloseOnPressOutside
@@ -70,6 +71,7 @@ LingmoPopup{
         anchors.leftMargin: 20
         anchors.rightMargin: 20
         ScrollBar.vertical: LingmoScrollBar{}
+        clip: true
         delegate: Rectangle{
             id: rect_delegate
             height: 60
@@ -86,9 +88,14 @@ LingmoPopup{
                 }
                 ColumnLayout{
                     LingmoText{
-                        text: request.downloadFileName
+                        text: {
+                            if(request.downloadFileName.length>25){
+                                return request.downloadFileName.substr(0,25)+"..."
+                            }
+                            return request.downloadFileName
+                        }
                     }
-                    ProgressBar{
+                    QQCL.ProgressBar{
                         id: progress_bar
                         from: 0
                         value: request.receivedBytes
@@ -106,7 +113,7 @@ LingmoPopup{
                             if(request.isFinished){
                                 return "Have Been Finished"
                             }
-                            return request.receivedBytes.toString()+"B/"+request.totalBytes.toString();
+                            return request.receivedBytes.toString()+"B/"+request.totalBytes.toString()+"B";
                         }
                     }
                 }
@@ -145,6 +152,14 @@ LingmoPopup{
                             request.cancel()
                             rect_delegate.cancelled=true;
                         }
+                    }
+                }
+                LingmoIconButton{
+                    id: redownload_button
+                    iconSource: LingmoIcons.Refresh
+                    visible: rect_delegate.cancelled || rect_delegate.deleted
+                    onClicked: {
+                        parentWindow.newTab(request.url)
                     }
                 }
             }

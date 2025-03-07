@@ -34,7 +34,7 @@ LingmoPopup{
         anchors.right: parent.right
         LingmoIconButton{
             iconSource: LingmoIcons.NewWindow
-            text: "Open Downloads Page"
+            text: "Open Downloads History"
             Layout.alignment: Qt.AlignVCenter
             onClicked: {
                 popup.close();

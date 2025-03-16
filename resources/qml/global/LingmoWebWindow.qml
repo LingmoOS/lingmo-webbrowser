@@ -22,7 +22,10 @@ LingmoWindow{
     property ListModel downloadRequests
     signal newWindowRequested
     function getSpecialTitle(url){
-        if(url=="browser://downloads"){
+        if(url=="browser://collections"){
+            return "Collections"
+        }
+        else if(url=="browser://downloads"){
             return "Downloads"
         }
         else if(url=="browser://extensions"){
@@ -535,6 +538,7 @@ LingmoWindow{
                     argument.url=text;
                     webView_.url=text;
                     forceActiveFocus();
+                    collections_page.visible=(webView_.url=="browser://collections");
                     download_page.visible=(webView_.url=="browser://downloads");
                     extension_page.visible=(webView_.url=="browser://extensions");
                     history_page.visible=(webView_.url=="browser://history");
@@ -574,6 +578,11 @@ LingmoWindow{
                 btn_reload.iconSource=loading ? LingmoIcons.Cancel : LingmoIcons.Refresh ;
                 btn_reload.text=loading ? qsTr('Cancel Reload') : qsTr('Reload');
                 profile.persistentStoragePath=Qt.resolvedUrl(".").toString().replace("qml/global","data/storage").replace("file:///","");
+            }
+            Collections{
+                id: collections_page
+                visible: argument.url=="browser://collections"
+                z: 32767
             }
             Downloads{
                 id: download_page

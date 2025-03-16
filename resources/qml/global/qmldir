@@ -1,2 +1,3 @@
 module global
 LingmoWebWindow 1.0 LingmoWebWindow.qml
+LingmoSideBar 1.0 LingmoSideBar.qml

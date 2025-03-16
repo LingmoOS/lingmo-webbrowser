@@ -3,16 +3,17 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Dialogs
 import LingmoUI
+import global
 
 Rectangle{
     id: rect
-    LingmoText{
-        id: heading
-        text: "Settings"
-        font: LingmoTextStyle.Title
-        anchors.top: parent.top
-        anchors.left: parent.left
-        anchors.topMargin: 20
-        anchors.leftMargin: 20
+    LingmoSideBar{
+        id: sidebar
+        width: 300
+        height: 600
+        title: "Settings"
+    }
+    Component.onCompleted: {
+        sidebar.model.append({title:"页面1",name:"page1",iconSource: "browser.svg"});
     }
 }

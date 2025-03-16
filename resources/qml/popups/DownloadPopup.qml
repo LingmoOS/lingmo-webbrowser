@@ -152,6 +152,7 @@ LingmoPopup{
                             request.cancel()
                             rect_delegate.cancelled=true;
                         }
+                        DownloadHistoryData.append(request.downloadDirectory,request.downloadFileName,request.mimeType,request.url,cancelled,deleted)
                     }
                 }
                 LingmoIconButton{
@@ -168,6 +169,7 @@ LingmoPopup{
                 function onDownloadFinished(request_){
                     if(request===request_){
                         file_icon.source=FileIconProvidingHandler.icon(request.downloadFileName);
+                        DownloadHistoryData.append(request.downloadDirectory,request.downloadFileName,request.mimeType,request.url,cancelled,deleted)
                     }
                 }
             }

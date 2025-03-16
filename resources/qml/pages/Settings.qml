@@ -14,6 +14,6 @@ Rectangle{
         title: "Settings"
     }
     Component.onCompleted: {
-        sidebar.model.append({title:"页面1",name:"page1",iconSource: "browser.svg"});
+        sidebar.model.append({title:"页面1",name:"page1",iconSource: "file-settings-line.svg"});
     }
 }

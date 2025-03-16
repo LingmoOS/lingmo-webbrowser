@@ -14,6 +14,6 @@ Rectangle{
         title: "History"
     }
     Component.onCompleted: {
-        sidebar.model.append({title:"昨天",name:"yesterday",iconSource: "browser.svg"});
+        sidebar.model.append({title:"昨天",name:"yesterday",iconSource: "time-line.svg"});
     }
 }

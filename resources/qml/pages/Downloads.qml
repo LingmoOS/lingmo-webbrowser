@@ -14,7 +14,7 @@ Rectangle{
         title: "Downloads"
     }
     Component.onCompleted: {
-        sidebar.model.append({title:"最近下载",name:"recentlyDownloads",iconSource: "browser.svg"});
-        sidebar.model.append({title:"下载历史",name:"downloadHistory",iconSource: "browser.svg"});
+        sidebar.model.append({title:"最近下载",name:"recentlyDownloads",iconSource: "download-line.svg"});
+        sidebar.model.append({title:"下载历史",name:"downloadHistory",iconSource: "time-line.svg"});
     }
 }

@@ -14,9 +14,7 @@ Rectangle{
         title: "Extensions"
     }
     Component.onCompleted: {
-        sidebar.model.append({title:"默认分类",name:"defaultCategory",iconSource: "browser.svg"});
-        sidebar.model.append({title:"未命名1",name:"untitled1",iconSource: "browser.svg"});
-        sidebar.model.append({title:"未命名2",name:"untitled2",iconSource: "browser.svg"});
-        sidebar.model.append({title:"未命名3",name:"untitled3",iconSource: "browser.svg"});
+        sidebar.model.append({title:"默认分类",name:"defaultCategory",iconSource: "folder-2-line.svg"});
+        sidebar.model.append({title:"未命名1",name:"untitled1",iconSource: "folder-3-line.svg"});
     }
 }

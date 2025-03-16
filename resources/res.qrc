@@ -1,6 +1,14 @@
 <RCC>
     <qresource prefix='/'>
         <file>qml/main.qml</file>
+        <file>images/arrow-down-long-line.svg</file>
         <file>images/browser.svg</file>
+        <file>images/calendar-schedule-line.svg</file>
+        <file>images/download-line.svg</file>
+        <file>images/file-settings-line.svg</file>
+        <file>images/folder-2-line.svg</file>
+        <file>images/folder-3-line.svg</file>
+        <file>images/menu-line.svg</file>
+        <file>images/time-line.svg</file>
     </qresource>
 </RCC>

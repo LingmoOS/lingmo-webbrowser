@@ -13,8 +13,11 @@ if __name__ == "__main__":
     qmlRegisterSingletonType(FileManagerHandler,'org.lingmo.webbrowser',1,0,'FileManagerHandler')
     qmlRegisterSingletonType(DownloadHistoryData,'org.lingmo.webbrowser',1,0,'DownloadHistoryData')
     QtWebEngineQuick.initialize()
+    eventfilter=EventFilter()
+    QGuiApplication.instance().installEventFilter(eventfilter)
     engine = QQmlApplicationEngine()
     engine.addImportPath(os.getcwd()+'/../resources/qml')
+    engine.rootContext().setContextProperty('eventFilter',eventfilter)
     engine.load('qrc:/qml/main.qml')
     if not engine.rootObjects():
         sys.exit(-1)

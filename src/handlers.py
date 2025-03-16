@@ -33,3 +33,15 @@ class FileManagerHandler(QQuickItem):
     @Slot(str)
     def delete(self,path):
         os.remove(path)
+
+class EventFilter(QObject,QAbstractNativeEventFilter):
+    ctrlWheelEvent=Signal()
+    def __init__(self):
+        super().__init__()
+    def eventFilter(self, watched, event):
+        if event.type()==QEvent.Type.Wheel:
+            wheelEvent=QWheelEvent(event)
+            if wheelEvent.modifiers() & Qt.KeyboardModifier.ControlModifier:
+                self.ctrlWheelEvent.emit()
+                return True
+        return super().eventFilter(watched, event)

@@ -9,11 +9,15 @@ import LingmoUI
 
 LingmoPopup{
     id: popup
-    width: 600
-    height: 400
+    width: 250
+    height: 100
     modal: false
     closePolicy: pinned ? LingmoPopup.CloseOnEscape : LingmoPopup.CloseOnEscape|LingmoPopup.CloseOnPressOutside
     property bool pinned: false
+    property alias text: factor_text.text
+    property alias zoom_in_button: zoom_in
+    property alias zoom_out_button: zoom_out
+    property alias reset_button: reset
     property LingmoWindow parentWindow
     LingmoText{
         id: heading
@@ -22,7 +26,7 @@ LingmoPopup{
         anchors.left: parent.left
         anchors.topMargin: 20
         anchors.leftMargin: 20
-        font: LingmoTextStyle.Title
+        font: LingmoTextStyle.Body
     }
     RowLayout{
         spacing: 10
@@ -37,9 +41,33 @@ LingmoPopup{
         LingmoIconButton{
             iconSource: LingmoIcons.Cancel
             Layout.alignment: Qt.AlignVCenter
+            visible: !popup.pinned
             onClicked: {
                 popup.close()
             }
+        }
+    }
+    RowLayout{
+        anchors.top: heading.bottom
+        anchors.left: parent.left
+        anchors.leftMargin: 20
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        LingmoText{
+            id: factor_text
+            text: "100%"
+        }
+        LingmoIconButton{
+            id: zoom_in
+            iconSource: LingmoIcons.Add
+        }
+        LingmoIconButton{
+            id: zoom_out
+            iconSource: LingmoIcons.Remove
+        }
+        LingmoButton{
+            id: reset
+            text: qsTr("Reset")
         }
     }
 }

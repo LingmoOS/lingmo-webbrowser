@@ -305,6 +305,7 @@ LingmoWindow{
             anchors.fill: parent
             url: argument.url
             property bool is_fullscreen: false
+            property real prev_zoomFactor: 1.0
             onAuthenticationDialogRequested: {
 
             }
@@ -473,6 +474,24 @@ LingmoWindow{
                 toolTip.requestType=request.type;
             }
             onUrlChanged: {
+                if(collections_page.visible){
+                    return;
+                }
+                if(download_page.visible){
+                    return;
+                }
+                if(extension_page.visible){
+                    return;
+                }
+                if(history_page.visible){
+                    return;
+                }
+                if(settings_page.visible){
+                    return;
+                }
+                if(start_page.visible){
+                    return;
+                }
                 urlLine.text = url
             }
             onWebAuthUxRequested: {
@@ -480,9 +499,6 @@ LingmoWindow{
             }
             onWindowCloseRequested: {
                 web_tabView.closeTab(web_tabView.currentIndex);
-            }
-            onZoomFactorChanged: {
-                
             }
             settings.pluginsEnabled: true
             settings.fullScreenSupportEnabled: true
@@ -570,6 +586,30 @@ LingmoWindow{
                         window.height+=31;
                         is_fullscreen=true;
                     }
+                }
+            }
+            Connections{
+                target: zoom_popup.zoom_in_button
+                enabled: window.isCurrentTab(argument.id)
+                function onClicked(){
+                    webView_.zoomFactor+=0.05
+                    zoom_popup.text=Math.floor(webView_.zoomFactor*100+0.5).toString()+"%"
+                }
+            }
+            Connections{
+                target: zoom_popup.zoom_out_button
+                enabled: window.isCurrentTab(argument.id)
+                function onClicked(){
+                    webView_.zoomFactor-=0.05;
+                    zoom_popup.text=Math.floor(webView_.zoomFactor*100+0.5).toString()+"%"
+                }
+            }
+            Connections{
+                target: zoom_popup.reset_button
+                enabled: window.isCurrentTab(argument.id)
+                function onClicked(){
+                    webView_.zoomFactor=1;
+                    zoom_popup.text=Math.floor(webView_.zoomFactor*100+0.5).toString()+"%"
                 }
             }
             Component.onCompleted: {

@@ -330,11 +330,33 @@ LingmoWindow{
                 context_menu.y=request.position.y+60;
                 context_menu.open();
             }
-            onDesktopMediaRequested: {
-                
-            }
-            onFeaturePermissionRequested: {
-
+            onFeaturePermissionRequested: function(securityOrigin,feature){
+                feature_request_popup.securityOrigin=securityOrigin;
+                feature_request_popup.feature=feature;
+                switch(feature){
+                    case WebEngineView.Geolocation:
+                        feature_request_popup.requestText=qsTr("Geolocation")
+                        break;
+                    case WebEngineView.MediaAudioCapture:
+                        feature_request_popup.requestText=qsTr("Audio Capture")
+                        break;
+                    case WebEngineView.MediaVideoCapture:
+                        feature_request_popup.requestText=qsTr("Video Capture")
+                        break;
+                    case WebEngineView.MediaAudioVideoCapture:
+                        feature_request_popup.requestText=qsTr("Audio and Video Capture")
+                        break;
+                    case WebEngineView.DesktopVideoCapture:
+                        feature_request_popup.requestText=qsTr("Desktop Video Capture")
+                        break;
+                    case WebEngineView.DesktopAudioVideoCapture:
+                        feature_request_popup.requestText=qsTr("Desktop Audio and Video Capture")
+                        break;
+                    case WebEngineView.Notifications:
+                        feature_request_popup.requestText=qsTr("Notifications")
+                        break;
+                }
+                feature_request_popup.open();
             }
             onFileDialogRequested: function(request) {
                 request.accepted = true;
@@ -410,7 +432,7 @@ LingmoWindow{
                 
             }
             onJavaScriptDialogRequested: {
-
+                
             }
             onLoadingChanged: {
                 btn_reload.iconSource=loading ? LingmoIcons.Cancel : LingmoIcons.Refresh 
@@ -827,6 +849,78 @@ LingmoWindow{
         parentWindow: window
         x: {return btn_zoom.x+contorlRightButtons.x+btn_download.width-width}
         y: {return window.appBar.height+toolArea.height}
+    }
+    LingmoPopup{
+        id: feature_request_popup
+        x: 10
+        y: {return window.appBar.height+toolArea.height}
+        width: 400
+        height: 150
+        modal: false
+        property url securityOrigin
+        property var feature
+        property string requestText
+        property WebEngineView webView
+        ColumnLayout{
+            anchors.fill: parent
+            anchors.margins: 10
+            LingmoText{
+                text: feature_request_popup.securityOrigin+" "+qsTr("Requests")
+                font: LingmoTextStyle.BodyStrong
+            }
+            LingmoText{
+                text: feature_request_popup.requestText
+                font: LingmoTextStyle.Body
+            }
+            RowLayout{
+                spacing: 10
+                Layout.alignment: Qt.AlignJustify
+                LingmoButton{
+                    text: qsTr("Accept")
+                    onClicked: {
+                        feature_request_popup.close();
+                        feature_request_popup.webView.grantFeaturePermission(feature_request_popup.securityOrigin,feature_request_popup.feature,true);
+                    }
+                }
+                LingmoButton{
+                    text: qsTr("Reject")
+                    onClicked: {
+                        feature_request_popup.close();
+                        feature_request_popup.webView.grantFeaturePermission(feature_request_popup.securityOrigin,feature_request_popup.feature,false);
+                    }
+                }
+            }
+        }
+    }
+    LingmoPopup{
+        id: console_message_popup
+        y: {return window.appBar.height+toolArea.height}
+        width: 400
+        padding: 10
+        bottomPadding: 20
+        modal: false
+        ColumnLayout{
+            anchors.fill: parent
+            anchors.margins: 10
+            spacing: 10
+            LingmoText{
+                text: qsTr("Displays")
+                font: LingmoTextStyle.BodyStrong
+            }
+            LingmoText{
+                text: qsTr("")
+                wrapMode: Text.WordWrap
+                font: LingmoTextStyle.Body
+                Layout.preferredWidth: parent.width-10
+            }
+            LingmoFilledButton{
+                text: qsTr("OK")
+                Layout.alignment: Qt.AlignRight
+                onClicked: {
+                    console_message_popup.close();
+                }
+            }
+        }
     }
     LingmoHotkey{
         id: hotkey_toggle_fullscreen

@@ -89,11 +89,9 @@ LingmoPopup{
                 ColumnLayout{
                     LingmoText{
                         text: {
-                            if(request.downloadFileName.length>25){
-                                return request.downloadFileName.substr(0,25)+"..."
-                            }
                             return request.downloadFileName
                         }
+                        elide: Qt.ElideMiddle
                     }
                     QQCL.ProgressBar{
                         id: progress_bar

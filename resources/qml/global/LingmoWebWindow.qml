@@ -333,6 +333,7 @@ LingmoWindow{
             onFeaturePermissionRequested: function(securityOrigin,feature){
                 feature_request_popup.securityOrigin=securityOrigin;
                 feature_request_popup.feature=feature;
+                feature_request_popup.webView=webView_;
                 switch(feature){
                     case WebEngineView.Geolocation:
                         feature_request_popup.requestText=qsTr("Geolocation")
@@ -428,11 +429,11 @@ LingmoWindow{
                 link_popup.visible=true;
                 link_popup_text.text=link;
             }
-            onJavaScriptConsoleMessage: {
-                
-            }
-            onJavaScriptDialogRequested: {
-                
+            onJavaScriptDialogRequested: function(request){
+                request.accepted=true;
+                dialog_request_popup.request=request;
+                dialog_entry.text="";
+                dialog_request_popup.open();
             }
             onLoadingChanged: {
                 btn_reload.iconSource=loading ? LingmoIcons.Cancel : LingmoIcons.Refresh 
@@ -893,31 +894,60 @@ LingmoWindow{
         }
     }
     LingmoPopup{
-        id: console_message_popup
+        id: dialog_request_popup
         y: {return window.appBar.height+toolArea.height}
         width: 400
         padding: 10
         bottomPadding: 20
         modal: false
+        property JavaScriptDialogRequest request
         ColumnLayout{
             anchors.fill: parent
             anchors.margins: 10
             spacing: 10
             LingmoText{
-                text: qsTr("Displays")
+                text: dialog_request_popup.request.securityOrigin + qsTr(" Displays")
                 font: LingmoTextStyle.BodyStrong
             }
             LingmoText{
-                text: qsTr("")
+                text: dialog_request_popup.request.message
                 wrapMode: Text.WordWrap
                 font: LingmoTextStyle.Body
                 Layout.preferredWidth: parent.width-10
             }
-            LingmoFilledButton{
-                text: qsTr("OK")
+            LingmoTextBox{
+                id: dialog_entry
+                visible: dialog_request_popup.request.type===JavaScriptDialogRequest.DialogTypePrompt
+                placeholderText: dialog_request_popup.request.defaultText
+                Layout.fillWidth: true
+                cleanEnabled: false
+            }
+            RowLayout{
+                spacing: 10
                 Layout.alignment: Qt.AlignRight
-                onClicked: {
-                    console_message_popup.close();
+                LingmoFilledButton{
+                    text: qsTr("OK")
+                    Layout.alignment: Qt.AlignRight
+                    onClicked: {
+                        if(dialog_request_popup.request.type===JavaScriptDialogRequest.DialogTypePrompt){
+                            dialog_request_popup.request.dialogAccept(dialog_entry.text);
+                        }
+                        else{
+                            dialog_request_popup.request.dialogAccept()
+                        }
+                        dialog_request_popup.close();
+                    }
+                }
+                LingmoButton{
+                    text: qsTr("Cancel")
+                    Layout.alignment: Qt.AlignRight
+                    visible: dialog_request_popup.request.type===JavaScriptDialogRequest.DialogTypePrompt || 
+                                dialog_request_popup.request.type===JavaScriptDialogRequest.DialogTypeConfirm ||
+                                dialog_request_popup.request.type===JavaScriptDialogRequest.DialogTypeBeforeUnload
+                    onClicked: {
+                        dialog_request_popup.request.dialogReject()
+                        dialog_request_popup.close();
+                    }
                 }
             }
         }

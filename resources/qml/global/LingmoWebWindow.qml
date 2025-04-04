@@ -311,9 +311,11 @@ LingmoWindow{
             }
             onCanGoBackChanged: {
                 btn_back.enabled = canGoBack
+                contextMenuItem_back.enabled = canGoBack
             }
             onCanGoForwardChanged: {
                 btn_forward.enabled = canGoForward
+                contextMenuItem_forward.enabled = canGoForward
             }
             onCertificateError:{
 
@@ -438,6 +440,8 @@ LingmoWindow{
             onLoadingChanged: {
                 btn_reload.iconSource=loading ? LingmoIcons.Cancel : LingmoIcons.Refresh 
                 btn_reload.text=loading ? qsTr('Cancel Reload') : qsTr('Reload')
+                contextMenuItem_reload_cancel.iconSource=loading ? LingmoIcons.Cancel : LingmoIcons.Refresh 
+                contextMenuItem_reload_cancel.text=loading ? qsTr('Cancel Reload') : qsTr('Reload')
                 if(loading){
                     web_tabView.setCurrentTabIcon("qrc:/images/browser.svg")
                 }
@@ -574,6 +578,7 @@ LingmoWindow{
                 target: urlLine
                 enabled: window.isCurrentTab(argument.id)
                 function onCommit(text) {
+                    text=UrlRedirectHandler.redirect(text);
                     argument.url=text;
                     webView_.url=text;
                     forceActiveFocus();
@@ -635,11 +640,49 @@ LingmoWindow{
                     zoom_popup.text=Math.floor(webView_.zoomFactor*100+0.5).toString()+"%"
                 }
             }
+            Connections{
+                target: contextMenuItem_back
+                enabled: window.isCurrentTab(argument.id) 
+                function onClicked() {
+                    goBack()
+                }
+            }
+            Connections{
+                target: contextMenuItem_forward
+                enabled: window.isCurrentTab(argument.id)
+                function onClicked() {
+                    goForward()
+                }
+            }
+            Connections{
+                target: contextMenuItem_reload_cancel
+                enabled: window.isCurrentTab(argument.id)
+                function onClicked() {
+                    if(loading){
+                        stop();
+                    }
+                    else{
+                        reload();
+                    }
+                }
+            }
+            Connections{
+                target: contextMenuItem_home
+                enabled: window.isCurrentTab(argument.id)
+                function onClicked() {
+                    argument.url=SettingsData.homeUrl;
+                    url=SettingsData.homeUrl;
+                }
+            }
             Component.onCompleted: {
                 btn_back.enabled = canGoBack;
                 btn_forward.enabled = canGoForward;
                 btn_reload.iconSource=loading ? LingmoIcons.Cancel : LingmoIcons.Refresh ;
                 btn_reload.text=loading ? qsTr('Cancel Reload') : qsTr('Reload');
+                contextMenuItem_back.enabled = canGoBack;
+                contextMenuItem_forward.enabled = canGoForward;
+                contextMenuItem_reload_cancel.iconSource=loading ? LingmoIcons.Cancel : LingmoIcons.Refresh ;
+                contextMenuItem_reload_cancel.text=loading ? qsTr('Cancel Reload') : qsTr('Reload');
                 profile.persistentStoragePath=Qt.resolvedUrl(".").toString().replace("qml/global","data/storage").replace("file:///","");
             }
             Collections{
@@ -756,13 +799,24 @@ LingmoWindow{
     LingmoMenu{
         id: context_menu
         LingmoMenuItem{
-            text: '1'
+            id: contextMenuItem_back
+            text: qsTr('Back')
+            iconSource: LingmoIcons.Back
         }
         LingmoMenuItem{
-            text: '1'
+            id: contextMenuItem_forward
+            text: qsTr('Forward')
+            iconSource: LingmoIcons.Forward
         }
         LingmoMenuItem{
-            text: '1'
+            id: contextMenuItem_reload_cancel
+            text: qsTr('Reload')
+            iconSource: LingmoIcons.Refresh
+        }
+        LingmoMenuItem{
+            id: contextMenuItem_home
+            text: qsTr('Home')
+            iconSource: LingmoIcons.Home
         }
         LingmoDivider{
             orientation: Qt.Horizontal

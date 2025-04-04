@@ -11,6 +11,7 @@ if __name__ == "__main__":
     qmlRegisterSingletonType(SettingsData,'org.lingmo.webbrowser',1,0,'SettingsData')
     qmlRegisterSingletonType(FileIconProvidingHandler,'org.lingmo.webbrowser',1,0,'FileIconProvidingHandler')
     qmlRegisterSingletonType(FileManagerHandler,'org.lingmo.webbrowser',1,0,'FileManagerHandler')
+    qmlRegisterSingletonType(UrlRedirectHandler,'org.lingmo.webbrowser',1,0,'UrlRedirectHandler')
     qmlRegisterSingletonType(DownloadHistoryData,'org.lingmo.webbrowser',1,0,'DownloadHistoryData')
     QtWebEngineQuick.initialize()
     engine = QQmlApplicationEngine()

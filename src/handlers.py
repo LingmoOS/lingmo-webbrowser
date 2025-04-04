@@ -6,6 +6,22 @@ from PySide6.QtWebEngineQuick import *
 from PySide6.QtWebEngineCore import *
 from PySide6.QtNetwork import *
 import os
+import re
+
+
+def is_valid_url(url):
+    pattern = re.compile(
+        r'^(?:http|ftp)s?://'  
+        r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|'  
+        r'localhost|' 
+        r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'  
+        r'(?::\d+)?'  
+        r'(?:/?|[/?]\S+)$', re.IGNORECASE)
+    return re.match(pattern, url) is not None
+def is_valid_localfile_url(url):
+    pattern = re.compile(r'^((?:file):///)?(?:(?:[a-zA-Z]:|\.{1,2})?[\\/](?:[^\\?/*|<>:"]+[\\/])*)(?:(?:[^\\?/*|<>:"]+?)(?:\.[^.\\?/*|<>:"]+)?)?$')
+    return re.match(pattern, url) is not None
+
 
 class FileIconProvidingHandler(QQuickItem):
     def __init__(self):
@@ -34,6 +50,7 @@ class FileManagerHandler(QQuickItem):
     def delete(self,path):
         os.remove(path)
 
+
 class EventFilter(QObject,QAbstractNativeEventFilter):
     ctrlWheelEvent=Signal()
     def __init__(self):
@@ -45,3 +62,18 @@ class EventFilter(QObject,QAbstractNativeEventFilter):
                 self.ctrlWheelEvent.emit()
                 return True
         return super().eventFilter(watched, event)
+    
+
+class UrlRedirectHandler(QQuickItem):
+    def __init__(self):
+        super().__init__()
+    @Slot(str,result=str)
+    def redirect(self, url):
+        if is_valid_url(url):
+            return url
+        elif is_valid_url("http://"+url):
+            return "http://"+url
+        elif is_valid_localfile_url(url):
+            return url
+        else:
+            return "https://cn.bing.com/search?form=bing&q="+url

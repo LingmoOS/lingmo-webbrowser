@@ -7,6 +7,7 @@ import LingmoUIPy
 import res
 
 if __name__ == "__main__":
+    os.environ['QTWEBENGINE_REMOTE_DEBUGGING']="1112"
     app = QGuiApplication(sys.argv)
     qmlRegisterSingletonType(SettingsData,'org.lingmo.webbrowser',1,0,'SettingsData')
     qmlRegisterSingletonType(FileIconProvidingHandler,'org.lingmo.webbrowser',1,0,'FileIconProvidingHandler')

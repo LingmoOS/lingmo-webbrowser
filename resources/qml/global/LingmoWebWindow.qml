@@ -300,420 +300,453 @@ LingmoWindow{
     }
     Component{
         id: com_webView
-        WebEngineView{
-            id: webView_
-            anchors.fill: parent
-            url: argument.url
-            property bool is_fullscreen: false
-            property real prev_zoomFactor: 1.0
-            onAuthenticationDialogRequested: {
+        SplitView{
+            WebEngineView{
+                id: webView_
+                SplitView.preferredWidth: parent.width*0.7
+                SplitView.fillHeight: true
+                url: argument.url
+                property bool is_fullscreen: false
+                property real prev_zoomFactor: 1.0
+                onAuthenticationDialogRequested: {
+                    
+                }
+                onCanGoBackChanged: {
+                    btn_back.enabled = canGoBack
+                    contextMenuItem_back.enabled = canGoBack
+                }
+                onCanGoForwardChanged: {
+                    btn_forward.enabled = canGoForward
+                    contextMenuItem_forward.enabled = canGoForward
+                }
+                onCertificateError:{
 
-            }
-            onCanGoBackChanged: {
-                btn_back.enabled = canGoBack
-                contextMenuItem_back.enabled = canGoBack
-            }
-            onCanGoForwardChanged: {
-                btn_forward.enabled = canGoForward
-                contextMenuItem_forward.enabled = canGoForward
-            }
-            onCertificateError:{
-
-            }
-            onColorDialogRequested: function(request){
-                request.accepted=true;
-                colorDialog.accepted.connect(function(){request.dialogAccept(colorDialog.selectedColor)})
-                colorDialog.rejected.connect(request.dialogReject)
-                colorDialog.visible = true;
-            }
-            onContextMenuRequested: function(request) {
-                request.accepted=true;
-                context_menu.x=request.position.x;
-                context_menu.y=request.position.y+60;
-                context_menu.open();
-            }
-            onFeaturePermissionRequested: function(securityOrigin,feature){
-                feature_request_popup.securityOrigin=securityOrigin;
-                feature_request_popup.feature=feature;
-                feature_request_popup.webView=webView_;
-                switch(feature){
-                    case WebEngineView.Geolocation:
-                        feature_request_popup.requestText=qsTr("Geolocation")
-                        break;
-                    case WebEngineView.MediaAudioCapture:
-                        feature_request_popup.requestText=qsTr("Audio Capture")
-                        break;
-                    case WebEngineView.MediaVideoCapture:
-                        feature_request_popup.requestText=qsTr("Video Capture")
-                        break;
-                    case WebEngineView.MediaAudioVideoCapture:
-                        feature_request_popup.requestText=qsTr("Audio and Video Capture")
-                        break;
-                    case WebEngineView.DesktopVideoCapture:
-                        feature_request_popup.requestText=qsTr("Desktop Video Capture")
-                        break;
-                    case WebEngineView.DesktopAudioVideoCapture:
-                        feature_request_popup.requestText=qsTr("Desktop Audio and Video Capture")
-                        break;
-                    case WebEngineView.Notifications:
-                        feature_request_popup.requestText=qsTr("Notifications")
-                        break;
                 }
-                feature_request_popup.open();
-            }
-            onFileDialogRequested: function(request) {
-                request.accepted = true;
-                switch(request.mode){
-                    case FileDialogRequest.FileModeOpen: {
-                        fileDialog.fileMode=FileDialog.OpenFile
-                        fileDialog.nameFilters=request.acceptedMimeTypes
-                        fileDialog.accepted.connect(function(){request.dialogAccept(fileDialog.selectedFiles)});
-                        fileDialog.rejected.connect(request.dialogReject);
-                        fileDialog.visible = true;
-                        break;
+                onColorDialogRequested: function(request){
+                    request.accepted=true;
+                    colorDialog.accepted.connect(function(){request.dialogAccept(colorDialog.selectedColor)})
+                    colorDialog.rejected.connect(request.dialogReject)
+                    colorDialog.visible = true;
+                }
+                onContextMenuRequested: function(request) {
+                    request.accepted=true;
+                    context_menu.x=request.position.x;
+                    context_menu.y=request.position.y+60;
+                    context_menu.open();
+                }
+                onFeaturePermissionRequested: function(securityOrigin,feature){
+                    feature_request_popup.securityOrigin=securityOrigin;
+                    feature_request_popup.feature=feature;
+                    feature_request_popup.webView=webView_;
+                    switch(feature){
+                        case WebEngineView.Geolocation:
+                            feature_request_popup.requestText=qsTr("Geolocation")
+                            break;
+                        case WebEngineView.MediaAudioCapture:
+                            feature_request_popup.requestText=qsTr("Audio Capture")
+                            break;
+                        case WebEngineView.MediaVideoCapture:
+                            feature_request_popup.requestText=qsTr("Video Capture")
+                            break;
+                        case WebEngineView.MediaAudioVideoCapture:
+                            feature_request_popup.requestText=qsTr("Audio and Video Capture")
+                            break;
+                        case WebEngineView.DesktopVideoCapture:
+                            feature_request_popup.requestText=qsTr("Desktop Video Capture")
+                            break;
+                        case WebEngineView.DesktopAudioVideoCapture:
+                            feature_request_popup.requestText=qsTr("Desktop Audio and Video Capture")
+                            break;
+                        case WebEngineView.Notifications:
+                            feature_request_popup.requestText=qsTr("Notifications")
+                            break;
                     }
-                    case FileDialogRequest.FileModeOpenMultiple: {
-                        fileDialog.fileMode=FileDialog.OpenFiles
-                        fileDialog.nameFilters=request.acceptedMimeTypes
-                        fileDialog.accepted.connect(function(){request.dialogAccept(fileDialog.selectedFiles)});
-                        fileDialog.rejected.connect(request.dialogReject);
-                        fileDialog.visible = true;
-                        break;
-                    }
-                    case FileDialogRequest.FileModeUploadFolder: {
-                        folderDialog.accepted.connect(function(){request.dialogAccept(folderDialog.selectedFolder)});
-                        forderDialog.rejected.connect(request.dialogReject);
-                        forderDialog.visible = true;
-                        break;
-                    }
-                    case FileDialogRequest.FileModeSave: {
-                        fileDialog.fileMode=FileDialog.SaveFile
-                        fileDialog.nameFilters=request.acceptedMimeTypes
-                        fileDialog.accepted.connect(function(){request.dialogAccept(fileDialog.selectedFiles)});
-                        fileDialog.rejected.connect(request.dialogReject);
-                        fileDialog.visible = true;
-                        break;
+                    feature_request_popup.open();
+                }
+                onFileDialogRequested: function(request) {
+                    request.accepted = true;
+                    switch(request.mode){
+                        case FileDialogRequest.FileModeOpen: {
+                            fileDialog.fileMode=FileDialog.OpenFile
+                            fileDialog.nameFilters=request.acceptedMimeTypes
+                            fileDialog.accepted.connect(function(){request.dialogAccept(fileDialog.selectedFiles)});
+                            fileDialog.rejected.connect(request.dialogReject);
+                            fileDialog.visible = true;
+                            break;
+                        }
+                        case FileDialogRequest.FileModeOpenMultiple: {
+                            fileDialog.fileMode=FileDialog.OpenFiles
+                            fileDialog.nameFilters=request.acceptedMimeTypes
+                            fileDialog.accepted.connect(function(){request.dialogAccept(fileDialog.selectedFiles)});
+                            fileDialog.rejected.connect(request.dialogReject);
+                            fileDialog.visible = true;
+                            break;
+                        }
+                        case FileDialogRequest.FileModeUploadFolder: {
+                            folderDialog.accepted.connect(function(){request.dialogAccept(folderDialog.selectedFolder)});
+                            forderDialog.rejected.connect(request.dialogReject);
+                            forderDialog.visible = true;
+                            break;
+                        }
+                        case FileDialogRequest.FileModeSave: {
+                            fileDialog.fileMode=FileDialog.SaveFile
+                            fileDialog.nameFilters=request.acceptedMimeTypes
+                            fileDialog.accepted.connect(function(){request.dialogAccept(fileDialog.selectedFiles)});
+                            fileDialog.rejected.connect(request.dialogReject);
+                            fileDialog.visible = true;
+                            break;
+                        }
                     }
                 }
-            }
-            onFileSystemAccessRequested: function(request){
-                request.accept();
-            }
-            onFindTextFinished: {
-                
-            }
-            onFullScreenRequested: function(request){
-                if(!is_fullscreen){
-                    if(request.toggleOn){
-                        window.useSystemAppBar=true;
-                        web_tabView.anchors.topMargin=-35;
-                        window.showFullScreen();
+                onFileSystemAccessRequested: function(request){
+                    request.accept();
+                }
+                onFindTextFinished: {
+                    
+                }
+                onFullScreenRequested: function(request){
+                    if(!is_fullscreen){
+                        if(request.toggleOn){
+                            window.useSystemAppBar=true;
+                            web_tabView.anchors.topMargin=-35;
+                            window.showFullScreen();
+                        }
+                        else{
+                            window.useSystemAppBar=false;
+                            web_tabView.anchors.topMargin=30;
+                            window.showNormal();
+                        }
                     }
-                    else{
-                        window.useSystemAppBar=false;
-                        web_tabView.anchors.topMargin=30;
-                        window.showNormal();
-                    }
+                    request.accept();
                 }
-                request.accept();
-            }
-            onGeometryChangeRequested: function(geometry){
-                window.x = geometry.x;
-                window.y = geometry.y-65;
-                window.width = geometry.width;
-                window.height = geometry.height+65;
-            }
-            onIconChanged:{
-                var str=icon.toString();
-                web_tabView.setCurrentTabIcon(str.replace("image://favicon/",""));
-            }
-            onLinkHovered: function(link){
-                link_popup.visible=true;
-                link_popup_text.text=link;
-            }
-            onJavaScriptDialogRequested: function(request){
-                request.accepted=true;
-                dialog_request_popup.request=request;
-                dialog_entry.text="";
-                dialog_request_popup.open();
-            }
-            onLoadingChanged: {
-                btn_reload.iconSource=loading ? LingmoIcons.Cancel : LingmoIcons.Refresh 
-                btn_reload.text=loading ? qsTr('Cancel Reload') : qsTr('Reload')
-                contextMenuItem_reload_cancel.iconSource=loading ? LingmoIcons.Cancel : LingmoIcons.Refresh 
-                contextMenuItem_reload_cancel.text=loading ? qsTr('Cancel Reload') : qsTr('Reload')
-                if(loading){
-                    web_tabView.setCurrentTabIcon("qrc:/images/browser.svg")
+                onGeometryChangeRequested: function(geometry){
+                    window.x = geometry.x;
+                    window.y = geometry.y-65;
+                    window.width = geometry.width;
+                    window.height = geometry.height+65;
                 }
-            }
-            // onNavigationRequested: function(request){
-            //     switch(request.navigationType){
-            //         case WebEngineNavigationRequest.LinkClickedNavigation: {
-            //             print('Link Clicked Navigation');
-            //             break;
-            //         }
-            //         case WebEngineNavigationRequest.TypedNavigation: {
-            //             print('Typed Navigation');
-            //             break;
-            //         }
-            //         case WebEngineNavigationRequest.FormSubmittedNavigation: {
-            //             print('Form Submitted Navigation');
-            //             break;
-            //         }
-            //         case WebEngineNavigationRequest.BackForwardNavigation: {
-            //             print('Back/Forward Navigation');
-            //             break;
-            //         }
-            //         case WebEngineNavigationRequest.ReloadNavigation: {
-            //             print('Reload Navigation');
-            //             break;
-            //         }
-            //         case WebEngineNavigationRequest.RedirectNavigation: {
-            //             print('Redirect Navigation');
-            //             break;
-            //         }
-            //         case WebEngineNavigationRequest.OtherNavigation: {
-            //             print('Other Navigation');
-            //             break;
-            //         }
-            //     }
-            // }
-            onNewWindowRequested: function(request) {
-                window.newTab(request.requestedUrl);
-            }
-            onPrintRequested: {
-
-            }
-            onQuotaRequested: {
-
-            }
-            onRegisterProtocolHandlerRequested: {
-
-            }
-            onTitleChanged:{
-                web_tabView.setCurrentText(title);
-            }
-            onTooltipRequested: function(request){
-                request.accepted=true;
-                toolTip.x=request.x;
-                toolTip.y=request.y+30;
-                toolTip.text=request.text;
-                toolTip.requestType=request.type;
-            }
-            onUrlChanged: {
-                if(collections_page.visible){
-                    return;
+                onIconChanged:{
+                    var str=icon.toString();
+                    web_tabView.get(now_index()).tab_icon=str.replace("image://favicon/","");
                 }
-                if(download_page.visible){
-                    return;
+                onLinkHovered: function(link){
+                    link_popup.visible=true;
+                    link_popup_text.text=link;
                 }
-                if(extension_page.visible){
-                    return;
+                onJavaScriptDialogRequested: function(request){
+                    request.accepted=true;
+                    dialog_request_popup.request=request;
+                    dialog_entry.text="";
+                    dialog_request_popup.open();
                 }
-                if(history_page.visible){
-                    return;
-                }
-                if(settings_page.visible){
-                    return;
-                }
-                if(start_page.visible){
-                    return;
-                }
-                urlLine.text = url
-            }
-            onWebAuthUxRequested: {
-                
-            }
-            onWindowCloseRequested: {
-                web_tabView.closeTab(web_tabView.currentIndex);
-            }
-            settings.pluginsEnabled: true
-            settings.fullScreenSupportEnabled: true
-            profile.offTheRecord: false
-            profile.downloadPath: {return SettingsData.downloadPath}
-            settings.localStorageEnabled: true
-            profile.onDownloadRequested: function(request){
-                for(var i=0;i<window.downloadRequests.count;i++){
-                    if(window.downloadRequests.get(i).id==request.id)return;
-                }
-                window.downloadRequests.append({"request": request,"id": request.id,"profile": profile})
-                request.accept();
-                download_popup.open();
-            }
-            Connections{
-                target: btn_back
-                enabled: window.isCurrentTab(argument.id) 
-                function onClicked() {
-                    goBack()
-                }
-            }
-            Connections{
-                target: btn_forward
-                enabled: window.isCurrentTab(argument.id)
-                function onClicked() {
-                    goForward()
-                }
-            }
-            Connections{
-                target: btn_reload
-                enabled: window.isCurrentTab(argument.id)
-                function onClicked() {
+                onLoadingChanged: {
+                    btn_reload.iconSource=loading ? LingmoIcons.Cancel : LingmoIcons.Refresh 
+                    btn_reload.text=loading ? qsTr('Cancel Reload') : qsTr('Reload')
+                    contextMenuItem_reload_cancel.iconSource=loading ? LingmoIcons.Cancel : LingmoIcons.Refresh 
+                    contextMenuItem_reload_cancel.text=loading ? qsTr('Cancel Reload') : qsTr('Reload')
                     if(loading){
-                        stop();
-                    }
-                    else{
-                        reload();
+                        web_tabView.setCurrentTabIcon("qrc:/images/browser.svg")
                     }
                 }
-            }
-            Connections{
-                target: btn_home
-                enabled: window.isCurrentTab(argument.id)
-                function onClicked() {
-                    argument.url=SettingsData.homeUrl;
-                    url=SettingsData.homeUrl;
+                // onNavigationRequested: function(request){
+                //     switch(request.navigationType){
+                //         case WebEngineNavigationRequest.LinkClickedNavigation: {
+                //             print('Link Clicked Navigation');
+                //             break;
+                //         }
+                //         case WebEngineNavigationRequest.TypedNavigation: {
+                //             print('Typed Navigation');
+                //             break;
+                //         }
+                //         case WebEngineNavigationRequest.FormSubmittedNavigation: {
+                //             print('Form Submitted Navigation');
+                //             break;
+                //         }
+                //         case WebEngineNavigationRequest.BackForwardNavigation: {
+                //             print('Back/Forward Navigation');
+                //             break;
+                //         }
+                //         case WebEngineNavigationRequest.ReloadNavigation: {
+                //             print('Reload Navigation');
+                //             break;
+                //         }
+                //         case WebEngineNavigationRequest.RedirectNavigation: {
+                //             print('Redirect Navigation');
+                //             break;
+                //         }
+                //         case WebEngineNavigationRequest.OtherNavigation: {
+                //             print('Other Navigation');
+                //             break;
+                //         }
+                //     }
+                // }
+                onNewWindowRequested: function(request) {
+                    window.newTab(request.requestedUrl);
                 }
-            }
-            Connections{
-                target: urlLine
-                enabled: window.isCurrentTab(argument.id)
-                function onCommit(text) {
-                    text=UrlRedirectHandler.redirect(text);
-                    argument.url=text;
-                    webView_.url=text;
-                    forceActiveFocus();
-                    collections_page.visible=(webView_.url=="browser://collections");
-                    download_page.visible=(webView_.url=="browser://downloads");
-                    extension_page.visible=(webView_.url=="browser://extensions");
-                    history_page.visible=(webView_.url=="browser://history");
-                    settings_page.visible=(webView_.url=="browser://settings");
-                    start_page.visible=(webView_.url=="browser://start");
-                    web_tabView.setCurrentText(window.getSpecialTitle(text))
+                onPrintRequested: {
+
                 }
-            }
-            Connections{
-                target: web_tabView
-                enabled: window.isCurrentTab(argument.id)
-                function onCurrentIndexChanged(){
-                    urlLine.text=url
+                onQuotaRequested: {
+
                 }
-            }
-            Connections{
-                target: hotkey_toggle_fullscreen
-                enabled: window.isCurrentTab(argument.id)
-                function onActivated(){
-                    if(is_fullscreen){
-                        web_tabView.anchors.topMargin=30;
-                        window.showNormal();
-                        is_fullscreen=false;
+                onRegisterProtocolHandlerRequested: {
+
+                }
+                onTitleChanged:{
+                    web_tabView.get(now_index()).text=title;
+                }
+                onTooltipRequested: function(request){
+                    request.accepted=true;
+                    toolTip.x=request.x;
+                    toolTip.y=request.y+30;
+                    toolTip.text=request.text;
+                    toolTip.requestType=request.type;
+                }
+                onUrlChanged: {
+                    if(collections_page.visible){
+                        return;
                     }
-                    else{
-                        web_tabView.anchors.topMargin=-35;
-                        window.showFullScreen();
-                        window.y=-31;
-                        window.height+=31;
-                        is_fullscreen=true;
+                    if(download_page.visible){
+                        return;
+                    }
+                    if(extension_page.visible){
+                        return;
+                    }
+                    if(history_page.visible){
+                        return;
+                    }
+                    if(settings_page.visible){
+                        return;
+                    }
+                    if(start_page.visible){
+                        return;
+                    }
+                    urlLine.text = url
+                }
+                onWebAuthUxRequested: {
+                    
+                }
+                onWindowCloseRequested: {
+                    web_tabView.closeTab(web_tabView.currentIndex);
+                }
+                settings.pluginsEnabled: true
+                settings.fullScreenSupportEnabled: true
+                profile.offTheRecord: false
+                profile.downloadPath: {return SettingsData.downloadPath}
+                settings.localStorageEnabled: true
+                profile.onDownloadRequested: function(request){
+                    for(var i=0;i<window.downloadRequests.count;i++){
+                        if(window.downloadRequests.get(i).id==request.id)return;
+                    }
+                    window.downloadRequests.append({"request": request,"id": request.id,"profile": profile})
+                    request.accept();
+                    download_popup.open();
+                }
+                Connections{
+                    target: btn_back
+                    enabled: window.isCurrentTab(argument.id) 
+                    function onClicked() {
+                        goBack()
                     }
                 }
-            }
-            Connections{
-                target: zoom_popup.zoom_in_button
-                enabled: window.isCurrentTab(argument.id)
-                function onClicked(){
-                    webView_.zoomFactor+=0.05
-                    zoom_popup.text=Math.floor(webView_.zoomFactor*100+0.5).toString()+"%"
-                }
-            }
-            Connections{
-                target: zoom_popup.zoom_out_button
-                enabled: window.isCurrentTab(argument.id)
-                function onClicked(){
-                    webView_.zoomFactor-=0.05;
-                    zoom_popup.text=Math.floor(webView_.zoomFactor*100+0.5).toString()+"%"
-                }
-            }
-            Connections{
-                target: zoom_popup.reset_button
-                enabled: window.isCurrentTab(argument.id)
-                function onClicked(){
-                    webView_.zoomFactor=1;
-                    zoom_popup.text=Math.floor(webView_.zoomFactor*100+0.5).toString()+"%"
-                }
-            }
-            Connections{
-                target: contextMenuItem_back
-                enabled: window.isCurrentTab(argument.id) 
-                function onClicked() {
-                    goBack()
-                }
-            }
-            Connections{
-                target: contextMenuItem_forward
-                enabled: window.isCurrentTab(argument.id)
-                function onClicked() {
-                    goForward()
-                }
-            }
-            Connections{
-                target: contextMenuItem_reload_cancel
-                enabled: window.isCurrentTab(argument.id)
-                function onClicked() {
-                    if(loading){
-                        stop();
-                    }
-                    else{
-                        reload();
+                Connections{
+                    target: btn_forward
+                    enabled: window.isCurrentTab(argument.id)
+                    function onClicked() {
+                        goForward()
                     }
                 }
-            }
-            Connections{
-                target: contextMenuItem_home
-                enabled: window.isCurrentTab(argument.id)
-                function onClicked() {
-                    argument.url=SettingsData.homeUrl;
-                    url=SettingsData.homeUrl;
+                Connections{
+                    target: btn_reload
+                    enabled: window.isCurrentTab(argument.id)
+                    function onClicked() {
+                        if(loading){
+                            stop();
+                        }
+                        else{
+                            reload();
+                        }
+                    }
+                }
+                Connections{
+                    target: btn_home
+                    enabled: window.isCurrentTab(argument.id)
+                    function onClicked() {
+                        argument.url=SettingsData.homeUrl;
+                        url=SettingsData.homeUrl;
+                    }
+                }
+                Connections{
+                    target: urlLine
+                    enabled: window.isCurrentTab(argument.id)
+                    function onCommit(text) {
+                        text=UrlRedirectHandler.redirect(text);
+                        argument.url=text;
+                        webView_.url=text;
+                        forceActiveFocus();
+                        collections_page.visible=(webView_.url=="browser://collections");
+                        download_page.visible=(webView_.url=="browser://downloads");
+                        extension_page.visible=(webView_.url=="browser://extensions");
+                        history_page.visible=(webView_.url=="browser://history");
+                        settings_page.visible=(webView_.url=="browser://settings");
+                        start_page.visible=(webView_.url=="browser://start");
+                        web_tabView.setCurrentText(window.getSpecialTitle(text))
+                    }
+                }
+                Connections{
+                    target: web_tabView
+                    enabled: window.isCurrentTab(argument.id)
+                    function onCurrentIndexChanged(){
+                        urlLine.text=webView_.url
+                    }
+                }
+                Connections{
+                    target: hotkey_toggle_fullscreen
+                    enabled: window.isCurrentTab(argument.id)
+                    function onActivated(){
+                        if(is_fullscreen){
+                            web_tabView.anchors.topMargin=30;
+                            window.showNormal();
+                            is_fullscreen=false;
+                        }
+                        else{
+                            web_tabView.anchors.topMargin=-35;
+                            window.showFullScreen();
+                            window.y=-31;
+                            window.height+=31;
+                            is_fullscreen=true;
+                        }
+                    }
+                }
+                Connections{
+                    target: hotkey_open_devTools
+                    enabled: window.isCurrentTab(argument.id)
+                    function onActivated(){
+                        webView_devtools.visible=!webView_devtools.visible;
+                    }
+                }
+                Connections{
+                    target: zoom_popup.zoom_in_button
+                    enabled: window.isCurrentTab(argument.id)
+                    function onClicked(){
+                        webView_.zoomFactor+=0.05
+                        zoom_popup.text=Math.floor(webView_.zoomFactor*100+0.5).toString()+"%"
+                    }
+                }
+                Connections{
+                    target: zoom_popup.zoom_out_button
+                    enabled: window.isCurrentTab(argument.id)
+                    function onClicked(){
+                        webView_.zoomFactor-=0.05;
+                        zoom_popup.text=Math.floor(webView_.zoomFactor*100+0.5).toString()+"%"
+                    }
+                }
+                Connections{
+                    target: zoom_popup.reset_button
+                    enabled: window.isCurrentTab(argument.id)
+                    function onClicked(){
+                        webView_.zoomFactor=1;
+                        zoom_popup.text=Math.floor(webView_.zoomFactor*100+0.5).toString()+"%"
+                    }
+                }
+                Connections{
+                    target: contextMenuItem_back
+                    enabled: window.isCurrentTab(argument.id) 
+                    function onClicked() {
+                        goBack()
+                    }
+                }
+                Connections{
+                    target: contextMenuItem_forward
+                    enabled: window.isCurrentTab(argument.id)
+                    function onClicked() {
+                        goForward()
+                    }
+                }
+                Connections{
+                    target: contextMenuItem_reload_cancel
+                    enabled: window.isCurrentTab(argument.id)
+                    function onClicked() {
+                        if(loading){
+                            stop();
+                        }
+                        else{
+                            reload();
+                        }
+                    }
+                }
+                Connections{
+                    target: contextMenuItem_home
+                    enabled: window.isCurrentTab(argument.id)
+                    function onClicked() {
+                        argument.url=SettingsData.homeUrl;
+                        url=SettingsData.homeUrl;
+                    }
+                }
+                Connections{
+                    target: contextMenuItem_view_source
+                    enabled: window.isCurrentTab(argument.id)
+                    function onClicked() {
+                        webView_.triggerWebAction(webView_.action(WebEngineView.ViewSource));
+                    }
+                }
+                Connections{
+                    target: contextMenuItem_open_devtools
+                    enabled: window.isCurrentTab(argument.id)
+                    function onClicked() {
+                        webView_devtools.visible=!webView_devtools.visible;
+                    }
+                }
+                Component.onCompleted: {
+                    btn_back.enabled = canGoBack;
+                    btn_forward.enabled = canGoForward;
+                    btn_reload.iconSource=loading ? LingmoIcons.Cancel : LingmoIcons.Refresh ;
+                    btn_reload.text=loading ? qsTr('Cancel Reload') : qsTr('Reload');
+                    contextMenuItem_back.enabled = canGoBack;
+                    contextMenuItem_forward.enabled = canGoForward;
+                    contextMenuItem_reload_cancel.iconSource=loading ? LingmoIcons.Cancel : LingmoIcons.Refresh ;
+                    contextMenuItem_reload_cancel.text=loading ? qsTr('Cancel Reload') : qsTr('Reload');
+                    profile.persistentStoragePath=Qt.resolvedUrl(".").toString().replace("qml/global","data/storage").replace("file:///","");
+                }
+                Collections{
+                    id: collections_page
+                    visible: argument.url=="browser://collections"
+                    z: 32767
+                }
+                Downloads{
+                    id: download_page
+                    visible: argument.url=="browser://downloads"
+                    z: 32767
+                }
+                Extensions{
+                    id: extension_page
+                    visible: argument.url=="browser://extensions"
+                    z: 32767
+                }
+                History{
+                    id: history_page
+                    visible: argument.url=="browser://history"
+                    z: 32767
+                }
+                Settings{
+                    id: settings_page
+                    visible: argument.url=="browser://settings"
+                    z: 32767
+                }
+                StartPage{
+                    id: start_page
+                    visible: argument.url=="browser://start"
+                    z: 32767
                 }
             }
-            Component.onCompleted: {
-                btn_back.enabled = canGoBack;
-                btn_forward.enabled = canGoForward;
-                btn_reload.iconSource=loading ? LingmoIcons.Cancel : LingmoIcons.Refresh ;
-                btn_reload.text=loading ? qsTr('Cancel Reload') : qsTr('Reload');
-                contextMenuItem_back.enabled = canGoBack;
-                contextMenuItem_forward.enabled = canGoForward;
-                contextMenuItem_reload_cancel.iconSource=loading ? LingmoIcons.Cancel : LingmoIcons.Refresh ;
-                contextMenuItem_reload_cancel.text=loading ? qsTr('Cancel Reload') : qsTr('Reload');
-                profile.persistentStoragePath=Qt.resolvedUrl(".").toString().replace("qml/global","data/storage").replace("file:///","");
-            }
-            Collections{
-                id: collections_page
-                visible: argument.url=="browser://collections"
-                z: 32767
-            }
-            Downloads{
-                id: download_page
-                visible: argument.url=="browser://downloads"
-                z: 32767
-            }
-            Extensions{
-                id: extension_page
-                visible: argument.url=="browser://extensions"
-                z: 32767
-            }
-            History{
-                id: history_page
-                visible: argument.url=="browser://history"
-                z: 32767
-            }
-            Settings{
-                id: settings_page
-                visible: argument.url=="browser://settings"
-                z: 32767
-            }
-            StartPage{
-                id: start_page
-                visible: argument.url=="browser://start"
-                z: 32767
+            WebEngineView{
+                id: webView_devtools
+                url: "http://127.0.0.1:1112/devtools/inspector.html?ws=127.0.0.1:1112/devtools/page/"+webView_.devToolsId
+                SplitView.fillHeight: true
+                visible: false
+                onWindowCloseRequested:{
+                    print(1);
+                }
             }
         }
     }
@@ -822,22 +855,57 @@ LingmoWindow{
             orientation: Qt.Horizontal
         }
         LingmoMenuItem{
-            text: '1'
+            id: contextMenuItem_undo
+            text: qsTr('Undo')
+            iconSource: LingmoIcons.Undo
         }
         LingmoMenuItem{
-            text: '1'
+            id: contextMenuItem_redo
+            text: qsTr('Redo')
+            iconSource: LingmoIcons.Redo
         }
         LingmoMenuItem{
-            text: '1'
+            id: contextMenuItem_cut
+            text: qsTr('Cut')
+            iconSource: LingmoIcons.Cut
         }
         LingmoMenuItem{
-            text: '1'
+            id: contextMenuItem_copy
+            text: qsTr('Copy')
+            iconSource: LingmoIcons.Copy
         }
         LingmoMenuItem{
-            text: '1'
+            id: contextMenuItem_paste
+            text: qsTr('Paste')
+            iconSource: LingmoIcons.Paste
         }
         LingmoMenuItem{
-            text: '1'
+            id: contextMenuItem_delete
+            text: qsTr('Delete')
+            iconSource: LingmoIcons.Delete
+        }
+        LingmoMenuItem{
+            id: contextMenuItem_select_all
+            text: qsTr('Select All')
+            iconSource: LingmoIcons.SelectAll
+        }
+        LingmoMenuItem{
+            id: contextMenuItem_translate
+            text: qsTr('Translate')
+            iconSource: LingmoIcons.LocaleLanguage
+        }
+        LingmoDivider{
+            orientation: Qt.Horizontal
+        }
+        LingmoMenuItem{
+            id: contextMenuItem_view_source
+            text: qsTr("View Source")
+            iconSource: LingmoIcons.Code
+        }
+        LingmoMenuItem{
+            id: contextMenuItem_open_devtools
+            text: qsTr("Open DevTools")
+            iconSource: LingmoIcons.NewWindow
         }
     }
     LingmoTooltip{
@@ -1010,5 +1078,10 @@ LingmoWindow{
         id: hotkey_toggle_fullscreen
         name: qsTr("Toogle Full Screen")
         sequence: "F11"
+    }
+    LingmoHotkey{
+        id: hotkey_open_devTools
+        name: qsTr("Open Dev Tools")
+        sequence: "Alt+F12"
     }
 }

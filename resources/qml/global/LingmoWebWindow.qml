@@ -687,7 +687,7 @@ LingmoWindow{
                     target: contextMenuItem_view_source
                     enabled: window.isCurrentTab(argument.id)
                     function onClicked() {
-                        webView_.triggerWebAction(webView_.action(WebEngineView.ViewSource));
+                        webView_.triggerWebAction(WebEngineView.ViewSource);
                     }
                 }
                 Connections{
@@ -744,9 +744,6 @@ LingmoWindow{
                 url: "http://127.0.0.1:1112/devtools/inspector.html?ws=127.0.0.1:1112/devtools/page/"+webView_.devToolsId
                 SplitView.fillHeight: true
                 visible: false
-                onWindowCloseRequested:{
-                    print(1);
-                }
             }
         }
     }

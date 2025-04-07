@@ -21,6 +21,9 @@ def is_valid_url(url):
 def is_valid_localfile_url(url):
     pattern = re.compile(r'^((?:file):///)?(?:(?:[a-zA-Z]:|\.{1,2})?[\\/](?:[^\\?/*|<>:"]+[\\/])*)(?:(?:[^\\?/*|<>:"]+?)(?:\.[^.\\?/*|<>:"]+)?)?$')
     return re.match(pattern, url) is not None
+def is_valid_browser_url(url):
+    pattern = re.compile(r'^((?:browser):/)?(?:(?:[a-zA-Z]:|\.{1,2})?[\\/](?:[^\\?/*|<>:"]+[\\/])*)(?:(?:[^\\?/*|<>:"]+?)(?:\.[^.\\?/*|<>:"]+)?)?$')
+    return re.match(pattern, url) is not None
 
 
 class FileIconProvidingHandler(QQuickItem):
@@ -70,6 +73,8 @@ class UrlRedirectHandler(QQuickItem):
     @Slot(str,result=str)
     def redirect(self, url):
         if is_valid_url(url):
+            return url
+        if is_valid_browser_url(url):
             return url
         elif is_valid_url("http://"+url):
             return "http://"+url

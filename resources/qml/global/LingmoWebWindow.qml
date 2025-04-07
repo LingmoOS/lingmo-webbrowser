@@ -332,6 +332,24 @@ LingmoWindow{
                     request.accepted=true;
                     context_menu.x=request.position.x;
                     context_menu.y=request.position.y+60;
+                    contextMenuItem_undo.visible=request.isContentEditable;
+                    contextMenuItem_redo.visible=request.isContentEditable;
+                    contextMenuItem_cut.visible=request.isContentEditable;
+                    contextMenuItem_copy.visible=request.isContentEditable;
+                    contextMenuItem_paste.visible=request.isContentEditable;
+                    contextMenuItem_paste_and_match_style.visible=request.isContentEditable;
+                    contextMenuItem_delete.visible=request.isContentEditable;
+                    contextMenuItem_select_all.visible=request.isContentEditable;
+                    contextMenuItem_text_direction.visible=request.isContentEditable;
+                    contextMenuDivider_edit.visible=request.isContentEditable;
+                    contextMenuItem_undo.enabled=(request.editFlags&ContextMenuRequest.CanUndo);
+                    contextMenuItem_redo.enabled=(request.editFlags&ContextMenuRequest.CanRedo);
+                    contextMenuItem_cut.enabled=(request.editFlags&ContextMenuRequest.CanCut);
+                    contextMenuItem_copy.enabled=(request.editFlags&ContextMenuRequest.CanCopy);
+                    contextMenuItem_paste.enabled=(request.editFlags&ContextMenuRequest.CanPaste);
+                    contextMenuItem_paste_and_match_style.enabled=(request.editFlags&ContextMenuRequest.CanPaste);
+                    contextMenuItem_delete.enabled=(request.editFlags&ContextMenuRequest.CanDelete);
+                    contextMenuItem_select_all.enabled=(request.editFlags&ContextMenuRequest.CanSelectAll);
                     context_menu.open();
                 }
                 onFeaturePermissionRequested: function(securityOrigin,feature){
@@ -546,25 +564,25 @@ LingmoWindow{
                     target: btn_back
                     enabled: window.isCurrentTab(argument.id) 
                     function onClicked() {
-                        goBack()
+                        webView_.goBack()
                     }
                 }
                 Connections{
                     target: btn_forward
                     enabled: window.isCurrentTab(argument.id)
                     function onClicked() {
-                        goForward()
+                        webView_.goForward()
                     }
                 }
                 Connections{
                     target: btn_reload
                     enabled: window.isCurrentTab(argument.id)
                     function onClicked() {
-                        if(loading){
-                            stop();
+                        if(webView_.loading){
+                            webView_.stop();
                         }
                         else{
-                            reload();
+                            webView_.reload();
                         }
                     }
                 }
@@ -572,8 +590,9 @@ LingmoWindow{
                     target: btn_home
                     enabled: window.isCurrentTab(argument.id)
                     function onClicked() {
+                        urlLine.text=SettingsData.homeUrl;
                         argument.url=SettingsData.homeUrl;
-                        url=SettingsData.homeUrl;
+                        webView_.url=SettingsData.homeUrl;
                     }
                 }
                 Connections{
@@ -653,25 +672,25 @@ LingmoWindow{
                     target: contextMenuItem_back
                     enabled: window.isCurrentTab(argument.id) 
                     function onClicked() {
-                        goBack()
+                        webView_.goBack()
                     }
                 }
                 Connections{
                     target: contextMenuItem_forward
                     enabled: window.isCurrentTab(argument.id)
                     function onClicked() {
-                        goForward()
+                        webView_.goForward()
                     }
                 }
                 Connections{
                     target: contextMenuItem_reload_cancel
                     enabled: window.isCurrentTab(argument.id)
                     function onClicked() {
-                        if(loading){
-                            stop();
+                        if(webView_.loading){
+                            webView_.stop();
                         }
                         else{
-                            reload();
+                            webView_.reload();
                         }
                     }
                 }
@@ -680,7 +699,77 @@ LingmoWindow{
                     enabled: window.isCurrentTab(argument.id)
                     function onClicked() {
                         argument.url=SettingsData.homeUrl;
-                        url=SettingsData.homeUrl;
+                        webView_.url=SettingsData.homeUrl;
+                    }
+                }
+                Connections{
+                    target: contextMenuItem_undo
+                    enabled: window.isCurrentTab(argument.id)
+                    function onClicked() {
+                        webView_.triggerWebAction(WebEngineView.Undo);
+                    }
+                }
+                Connections{
+                    target: contextMenuItem_redo
+                    enabled: window.isCurrentTab(argument.id)
+                    function onClicked() {
+                        webView_.triggerWebAction(WebEngineView.Redo);
+                    }
+                }
+                Connections{
+                    target: contextMenuItem_cut
+                    enabled: window.isCurrentTab(argument.id)
+                    function onClicked() {
+                        webView_.triggerWebAction(WebEngineView.Cut);
+                    }
+                }
+                Connections{
+                    target: contextMenuItem_copy
+                    enabled: window.isCurrentTab(argument.id)
+                    function onClicked() {
+                        webView_.triggerWebAction(WebEngineView.Copy);
+                    }
+                }
+                Connections{
+                    target: contextMenuItem_paste
+                    enabled: window.isCurrentTab(argument.id)
+                    function onClicked() {
+                        webView_.triggerWebAction(WebEngineView.Paste);
+                    }
+                }
+                Connections{
+                    target: contextMenuItem_paste_and_match_style
+                    enabled: window.isCurrentTab(argument.id)
+                    function onClicked() {
+                        webView_.triggerWebAction(WebEngineView.PasteAndMatchStyle);
+                    }
+                }
+                Connections{
+                    target: contextMenuItem_delete
+                    enabled: window.isCurrentTab(argument.id)
+                    function onClicked() {
+                        webView_.triggerWebAction(WebEngineView.Delete);
+                    }
+                }
+                Connections{
+                    target: contextMenuItem_select_all
+                    enabled: window.isCurrentTab(argument.id)
+                    function onClicked() {
+                        webView_.triggerWebAction(WebEngineView.SelectAll);
+                    }
+                }
+                Connections{
+                    target: contextMenuItem_text_direction_ltr
+                    enabled: window.isCurrentTab(argument.id)
+                    function onClicked() {
+                        webView_.triggerWebAction(WebEngineView.ChangeTextDirectionLTR);
+                    }
+                }
+                Connections{
+                    target: contextMenuItem_text_direction_rtl
+                    enabled: window.isCurrentTab(argument.id)
+                    function onClicked() {
+                        webView_.triggerWebAction(WebEngineView.ChangeTextDirectionRTL);
                     }
                 }
                 Connections{
@@ -691,10 +780,11 @@ LingmoWindow{
                     }
                 }
                 Connections{
-                    target: contextMenuItem_open_devtools
+                    target: contextMenuItem_inspect_element
                     enabled: window.isCurrentTab(argument.id)
                     function onClicked() {
-                        webView_devtools.visible=!webView_devtools.visible;
+                        webView_devtools.visible=true;
+                        webView_.triggerWebAction(WebEngineView.InspectElement);
                     }
                 }
                 Component.onCompleted: {
@@ -707,6 +797,10 @@ LingmoWindow{
                     contextMenuItem_reload_cancel.iconSource=loading ? LingmoIcons.Cancel : LingmoIcons.Refresh ;
                     contextMenuItem_reload_cancel.text=loading ? qsTr('Cancel Reload') : qsTr('Reload');
                     profile.persistentStoragePath=Qt.resolvedUrl(".").toString().replace("qml/global","data/storage").replace("file:///","");
+                    profile.persistentCookiesPolicy=WebEngineProfile.ForcePersistentCookies;
+                    profile.cachePath=Qt.resolvedUrl(".").toString().replace("qml/global","data/cache").replace("file:///","");
+                    profile.httpCacheType=WebEngineProfile.DiskHttpCache;
+                    
                 }
                 Collections{
                     id: collections_page
@@ -744,6 +838,13 @@ LingmoWindow{
                 url: "http://127.0.0.1:1112/devtools/inspector.html?ws=127.0.0.1:1112/devtools/page/"+webView_.devToolsId
                 SplitView.fillHeight: true
                 visible: false
+                onTooltipRequested: function(request){
+                    request.accepted=true;
+                    toolTip.x=request.x+webView_devtools.x;
+                    toolTip.y=request.y+30;
+                    toolTip.text=request.text;
+                    toolTip.requestType=request.type;
+                }
             }
         }
     }
@@ -828,6 +929,7 @@ LingmoWindow{
     }
     LingmoMenu{
         id: context_menu
+        width: 300
         LingmoMenuItem{
             id: contextMenuItem_back
             text: qsTr('Back')
@@ -877,6 +979,11 @@ LingmoWindow{
             iconSource: LingmoIcons.Paste
         }
         LingmoMenuItem{
+            id: contextMenuItem_paste_and_match_style
+            text: qsTr('Paste And Match Style')
+            iconSource: LingmoIcons.Paste
+        }
+        LingmoMenuItem{
             id: contextMenuItem_delete
             text: qsTr('Delete')
             iconSource: LingmoIcons.Delete
@@ -886,10 +993,119 @@ LingmoWindow{
             text: qsTr('Select All')
             iconSource: LingmoIcons.SelectAll
         }
+        LingmoMenu{
+            id: contextMenuItem_text_direction
+            title: qsTr('Text Direction')
+            width: 300
+            LingmoMenuItem{
+                id: contextMenuItem_text_direction_ltr
+                text: qsTr('Change Text Direction Left To Right')
+                iconSource: LingmoIcons.ArrowRight8
+            }
+            LingmoMenuItem{
+                id: contextMenuItem_text_direction_rtl
+                text: qsTr('Change Text Direction Right To Left')
+                iconSource: LingmoIcons.ArrowLeft8
+            }
+        }
+        LingmoDivider{
+            id: contextMenuDivider_edit
+            orientation: Qt.Horizontal
+        }
         LingmoMenuItem{
-            id: contextMenuItem_translate
-            text: qsTr('Translate')
-            iconSource: LingmoIcons.LocaleLanguage
+            id: contextMenuItem_open_link_in_this_window
+            text: qsTr('Open Link In This Window')
+            iconSource: LingmoIcons.OpenPaneMirrored
+        }
+        LingmoMenuItem{
+            id: contextMenuItem_open_link_in_new_window
+            text: qsTr('Open Link In New Window')
+            iconSource: LingmoIcons.OpenInNewWindow
+        }
+        LingmoMenuItem{
+            id: contextMenuItem_open_link_in_new_tab
+            text: qsTr('Open Link In New Tab')
+            iconSource: LingmoIcons.OpenWith
+        }
+        LingmoMenuItem{
+            id: contextMenuItem_copy_link_to_clipboard
+            text: qsTr('Copy Link To Clipboard')
+            iconSource: LingmoIcons.CopyTo
+        }
+        LingmoMenuItem{
+            id: contextMenuItem_download_link_to_disk
+            text: qsTr('Download Link To Disk')
+            iconSource: LingmoIcons.Download
+        }
+        LingmoDivider{
+            id: contextMenuDivider_link
+            orientation: Qt.Horizontal
+        }
+        LingmoMenuItem{
+            id: contextMenuItem_copy_image_to_clipboard
+            text: qsTr('Copy Image To Clipboard')
+            iconSource: LingmoIcons.CopyTo
+        }
+        LingmoMenuItem{
+            id: contextMenuItem_copy_url_image_to_clipboard
+            text: qsTr('Copy Image Url To Clipboard')
+            iconSource: LingmoIcons.CopyTo
+        }
+        LingmoMenuItem{
+            id: contextMenuItem_download_image_to_disk
+            text: qsTr('Download Image To Disk')
+            iconSource: LingmoIcons.Download
+        }
+        LingmoDivider{
+            id: contextMenuDivider_image
+            orientation: Qt.Horizontal
+        }
+        LingmoMenuItem{
+            id: contextMenuItem_copy_media_url_to_clipboard
+            text: qsTr('Copy Media Url To Clipboard')
+            iconSource: LingmoIcons.Download
+        }
+        LingmoMenuItem{
+            id: contextMenuItem_toogle_media_controls
+            text: qsTr('Toogle Media Controls')
+            iconSource: LingmoIcons.CallControl
+        }
+        LingmoMenuItem{
+            id: contextMenuItem_toogle_media_loop
+            text: qsTr('Toogle Media Loop')
+            iconSource: LingmoIcons.RestartUpdate
+        }
+        LingmoMenuItem{
+            id: contextMenuItem_toogle_media_play_pause
+            text: qsTr('Toogle Media Play Pause')
+            iconSource: LingmoIcons.Play
+        }
+        LingmoMenuItem{
+            id: contextMenuItem_toogle_media_mute
+            text: qsTr('Toogle Media Mute')
+            iconSource: LingmoIcons.Mute
+        }
+        LingmoMenuItem{
+            id: contextMenuItem_download_media_to_disk
+            text: qsTr('Download Media To Disk')
+            iconSource: LingmoIcons.Download
+        }
+        LingmoDivider{
+            id: contextMenuDivider_media
+            orientation: Qt.Horizontal
+        }
+        LingmoMenuItem{
+            id: contextMenuIten_exit_fullscreen
+            text: qsTr("Exit Fullescreen")
+            iconSource: LingmoIcons.BackToWindow
+        }
+        LingmoDivider{
+            orientation: Qt.Horizontal
+        }
+        LingmoMenuItem{
+            id: contextMenuItem_save_page
+            text: qsTr("Save Page")
+            iconSource: LingmoIcons.Save
         }
         LingmoDivider{
             orientation: Qt.Horizontal
@@ -900,9 +1116,12 @@ LingmoWindow{
             iconSource: LingmoIcons.Code
         }
         LingmoMenuItem{
-            id: contextMenuItem_open_devtools
-            text: qsTr("Open DevTools")
+            id: contextMenuItem_inspect_element
+            text: qsTr("Inspect Element")
             iconSource: LingmoIcons.NewWindow
+        }
+        onAboutToHide: {
+            contextMenuItem_text_direction.close();
         }
     }
     LingmoTooltip{

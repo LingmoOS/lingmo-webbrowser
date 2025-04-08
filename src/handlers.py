@@ -82,3 +82,17 @@ class UrlRedirectHandler(QQuickItem):
             return url
         else:
             return "https://cn.bing.com/search?form=bing&q="+url
+        
+
+class WebCookiesHandler(QQuickItem):
+    def __init__(self):
+        super().__init__()
+
+
+class WebActionHandler(QQuickItem):
+    def __init__(self):
+        super().__init__()
+    @Slot(int,result=int)
+    def action(index):
+        array=[0,1,7,8,4,5,6,11,9,45,46,12,13,14,15,16,17,18,19,20,21,22,23,24,25,27,30,32,26]
+        return array[index]

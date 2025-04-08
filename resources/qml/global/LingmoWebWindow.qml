@@ -20,6 +20,15 @@ LingmoWindow{
     property FolderDialog folderDialog
     property ColorDialog colorDialog
     property ListModel downloadRequests
+    property int menuTriggerIndex: 10
+    property list<int> actions: [WebEngineView.Back,WebEngineView.Forward,
+                    WebEngineView.Undo,WebEngineView.Redo,WebEngineView.Cut,WebEngineView.Copy,
+                    WebEngineView.Paste,WebEngineView.PasteAndMatchStyle,WebEngineView.SelectAll,
+                    WebEngineView.ChangeTextDirectionLTR,WebEngineView.ChangeTextDirectionRTL,WebEngineView.OpenLinkInThisWindow,WebEngineView.OpenLinkInNewWindow,
+                    WebEngineView.OpenLinkInNewTab,WebEngineView.CopyLinkToClipboard,WebEngineView.DownloadLinkToDisk,WebEngineView.CopyImageToClipboard,
+                    WebEngineView.CopyImageUrlToClipboard,WebEngineView.DownloadImageToDisk,WebEngineView.CopyMediaUrlToClipboard,WebEngineView.ToggleMediaControls,
+                    WebEngineView.ToggleMediaLoop,WebEngineView.ToggleMediaPlayPause,WebEngineView.ToggleMediaMute,WebEngineView.DownloadMediaToDisk,
+                    WebEngineView.ExitFullScreen,WebEngineView.SavePage,WebEngineView.ViewSource,WebEngineView.InspectElement];
     signal newWindowRequested
     function getSpecialTitle(url){
         if(url=="browser://collections"){
@@ -338,9 +347,8 @@ LingmoWindow{
                     contextMenuItem_copy.visible=request.isContentEditable;
                     contextMenuItem_paste.visible=request.isContentEditable;
                     contextMenuItem_paste_and_match_style.visible=request.isContentEditable;
-                    contextMenuItem_delete.visible=request.isContentEditable;
                     contextMenuItem_select_all.visible=request.isContentEditable;
-                    contextMenuItem_text_direction.visible=request.isContentEditable;
+                    context_menu.contentData[13].visible=request.isContentEditable;
                     contextMenuDivider_edit.visible=request.isContentEditable;
                     contextMenuItem_undo.enabled=(request.editFlags&ContextMenuRequest.CanUndo);
                     contextMenuItem_redo.enabled=(request.editFlags&ContextMenuRequest.CanRedo);
@@ -348,7 +356,6 @@ LingmoWindow{
                     contextMenuItem_copy.enabled=(request.editFlags&ContextMenuRequest.CanCopy);
                     contextMenuItem_paste.enabled=(request.editFlags&ContextMenuRequest.CanPaste);
                     contextMenuItem_paste_and_match_style.enabled=(request.editFlags&ContextMenuRequest.CanPaste);
-                    contextMenuItem_delete.enabled=(request.editFlags&ContextMenuRequest.CanDelete);
                     contextMenuItem_select_all.enabled=(request.editFlags&ContextMenuRequest.CanSelectAll);
                     context_menu.open();
                 }
@@ -502,9 +509,6 @@ LingmoWindow{
                     window.newTab(request.requestedUrl);
                 }
                 onPrintRequested: {
-
-                }
-                onQuotaRequested: {
 
                 }
                 onRegisterProtocolHandlerRequested: {
@@ -669,20 +673,6 @@ LingmoWindow{
                     }
                 }
                 Connections{
-                    target: contextMenuItem_back
-                    enabled: window.isCurrentTab(argument.id) 
-                    function onClicked() {
-                        webView_.goBack()
-                    }
-                }
-                Connections{
-                    target: contextMenuItem_forward
-                    enabled: window.isCurrentTab(argument.id)
-                    function onClicked() {
-                        webView_.goForward()
-                    }
-                }
-                Connections{
                     target: contextMenuItem_reload_cancel
                     enabled: window.isCurrentTab(argument.id)
                     function onClicked() {
@@ -698,93 +688,9 @@ LingmoWindow{
                     target: contextMenuItem_home
                     enabled: window.isCurrentTab(argument.id)
                     function onClicked() {
+                        urlLine.text=SettingsData.homeUrl;
                         argument.url=SettingsData.homeUrl;
                         webView_.url=SettingsData.homeUrl;
-                    }
-                }
-                Connections{
-                    target: contextMenuItem_undo
-                    enabled: window.isCurrentTab(argument.id)
-                    function onClicked() {
-                        webView_.triggerWebAction(WebEngineView.Undo);
-                    }
-                }
-                Connections{
-                    target: contextMenuItem_redo
-                    enabled: window.isCurrentTab(argument.id)
-                    function onClicked() {
-                        webView_.triggerWebAction(WebEngineView.Redo);
-                    }
-                }
-                Connections{
-                    target: contextMenuItem_cut
-                    enabled: window.isCurrentTab(argument.id)
-                    function onClicked() {
-                        webView_.triggerWebAction(WebEngineView.Cut);
-                    }
-                }
-                Connections{
-                    target: contextMenuItem_copy
-                    enabled: window.isCurrentTab(argument.id)
-                    function onClicked() {
-                        webView_.triggerWebAction(WebEngineView.Copy);
-                    }
-                }
-                Connections{
-                    target: contextMenuItem_paste
-                    enabled: window.isCurrentTab(argument.id)
-                    function onClicked() {
-                        webView_.triggerWebAction(WebEngineView.Paste);
-                    }
-                }
-                Connections{
-                    target: contextMenuItem_paste_and_match_style
-                    enabled: window.isCurrentTab(argument.id)
-                    function onClicked() {
-                        webView_.triggerWebAction(WebEngineView.PasteAndMatchStyle);
-                    }
-                }
-                Connections{
-                    target: contextMenuItem_delete
-                    enabled: window.isCurrentTab(argument.id)
-                    function onClicked() {
-                        webView_.triggerWebAction(WebEngineView.Delete);
-                    }
-                }
-                Connections{
-                    target: contextMenuItem_select_all
-                    enabled: window.isCurrentTab(argument.id)
-                    function onClicked() {
-                        webView_.triggerWebAction(WebEngineView.SelectAll);
-                    }
-                }
-                Connections{
-                    target: contextMenuItem_text_direction_ltr
-                    enabled: window.isCurrentTab(argument.id)
-                    function onClicked() {
-                        webView_.triggerWebAction(WebEngineView.ChangeTextDirectionLTR);
-                    }
-                }
-                Connections{
-                    target: contextMenuItem_text_direction_rtl
-                    enabled: window.isCurrentTab(argument.id)
-                    function onClicked() {
-                        webView_.triggerWebAction(WebEngineView.ChangeTextDirectionRTL);
-                    }
-                }
-                Connections{
-                    target: contextMenuItem_view_source
-                    enabled: window.isCurrentTab(argument.id)
-                    function onClicked() {
-                        webView_.triggerWebAction(WebEngineView.ViewSource);
-                    }
-                }
-                Connections{
-                    target: contextMenuItem_inspect_element
-                    enabled: window.isCurrentTab(argument.id)
-                    function onClicked() {
-                        webView_devtools.visible=true;
-                        webView_.triggerWebAction(WebEngineView.InspectElement);
                     }
                 }
                 Component.onCompleted: {
@@ -800,7 +706,22 @@ LingmoWindow{
                     profile.persistentCookiesPolicy=WebEngineProfile.ForcePersistentCookies;
                     profile.cachePath=Qt.resolvedUrl(".").toString().replace("qml/global","data/cache").replace("file:///","");
                     profile.httpCacheType=WebEngineProfile.DiskHttpCache;
-                    
+                    var targets=[contextMenuItem_back,contextMenuItem_forward,
+                    contextMenuItem_undo,contextMenuItem_redo,contextMenuItem_cut,contextMenuItem_copy,
+                    contextMenuItem_paste,contextMenuItem_paste_and_match_style,contextMenuItem_select_all,
+                    contextMenuItem_text_direction_ltr,contextMenuItem_text_direction_rtl,contextMenuItem_open_link_in_this_window,contextMenuItem_open_link_in_new_window,
+                    contextMenuItem_open_link_in_new_tab,contextMenuItem_copy_link_to_clipboard,contextMenuItem_download_link_to_disk,contextMenuItem_copy_image_to_clipboard,
+                    contextMenuItem_copy_image_url_to_clipboard,contextMenuItem_download_image_to_disk,contextMenuItem_copy_media_url_to_clipboard,contextMenuItem_toggle_media_controls,
+                    contextMenuItem_toggle_media_loop,contextMenuItem_toggle_media_play_pause,contextMenuItem_toggle_media_mute,contextMenuItem_download_media_to_disk,
+                    contextMenuItem_exit_fullscreen,contextMenuItem_save_page,contextMenuItem_view_source,contextMenuItem_inspect_element];
+                    for(var i=0;i<targets.length;i++){
+                        targets[i].clicked.connect(function(){
+                            if(window.isCurrentTab(argument.id)){
+                                print(actions[menuTriggerIndex])
+                                webView_.triggerWebAction(actions[menuTriggerIndex]);
+                            }
+                        })
+                    }
                 }
                 Collections{
                     id: collections_page
@@ -930,10 +851,14 @@ LingmoWindow{
     LingmoMenu{
         id: context_menu
         width: 300
+        signal triggered
         LingmoMenuItem{
             id: contextMenuItem_back
             text: qsTr('Back')
             iconSource: LingmoIcons.Back
+            onClicked:{
+                triggered(1)
+            }
         }
         LingmoMenuItem{
             id: contextMenuItem_forward
@@ -982,11 +907,6 @@ LingmoWindow{
             id: contextMenuItem_paste_and_match_style
             text: qsTr('Paste And Match Style')
             iconSource: LingmoIcons.Paste
-        }
-        LingmoMenuItem{
-            id: contextMenuItem_delete
-            text: qsTr('Delete')
-            iconSource: LingmoIcons.Delete
         }
         LingmoMenuItem{
             id: contextMenuItem_select_all
@@ -1047,7 +967,7 @@ LingmoWindow{
             iconSource: LingmoIcons.CopyTo
         }
         LingmoMenuItem{
-            id: contextMenuItem_copy_url_image_to_clipboard
+            id: contextMenuItem_copy_image_url_to_clipboard
             text: qsTr('Copy Image Url To Clipboard')
             iconSource: LingmoIcons.CopyTo
         }
@@ -1066,23 +986,23 @@ LingmoWindow{
             iconSource: LingmoIcons.Download
         }
         LingmoMenuItem{
-            id: contextMenuItem_toogle_media_controls
-            text: qsTr('Toogle Media Controls')
+            id: contextMenuItem_toggle_media_controls
+            text: qsTr('Toggle Media Controls')
             iconSource: LingmoIcons.CallControl
         }
         LingmoMenuItem{
-            id: contextMenuItem_toogle_media_loop
-            text: qsTr('Toogle Media Loop')
+            id: contextMenuItem_toggle_media_loop
+            text: qsTr('Toggle Media Loop')
             iconSource: LingmoIcons.RestartUpdate
         }
         LingmoMenuItem{
-            id: contextMenuItem_toogle_media_play_pause
-            text: qsTr('Toogle Media Play Pause')
+            id: contextMenuItem_toggle_media_play_pause
+            text: qsTr('Toggle Media Play Pause')
             iconSource: LingmoIcons.Play
         }
         LingmoMenuItem{
-            id: contextMenuItem_toogle_media_mute
-            text: qsTr('Toogle Media Mute')
+            id: contextMenuItem_toggle_media_mute
+            text: qsTr('Toggle Media Mute')
             iconSource: LingmoIcons.Mute
         }
         LingmoMenuItem{
@@ -1095,7 +1015,7 @@ LingmoWindow{
             orientation: Qt.Horizontal
         }
         LingmoMenuItem{
-            id: contextMenuIten_exit_fullscreen
+            id: contextMenuItem_exit_fullscreen
             text: qsTr("Exit Fullescreen")
             iconSource: LingmoIcons.BackToWindow
         }

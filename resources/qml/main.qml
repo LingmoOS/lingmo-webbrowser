@@ -14,11 +14,13 @@ LingmoObject {
         LingmoTheme.animationEnabled = true;
         LingmoTheme.blurBehindWindowEnabled = true;
         LingmoTheme.darkMode = LingmoThemeType.System;
-        newWindow()
+        newWindow();
     }
-    function newWindow(){
-        var new_window=com_web_window.createObject(null,{})
-        new_window.show()
+    property url newInitUrl: SettingsData.homeUrl
+    function newWindow(requestedUrl){
+        var new_window=com_web_window.createObject(null,{});
+        new_window.show();
+        newInitUrl=requestedUrl
     }
     ListModel{
         id: download_requests
@@ -30,8 +32,9 @@ LingmoObject {
             folderDialog: folder_dialog
             colorDialog: color_dialog
             downloadRequests: download_requests
+            initUrl: newInitUrl
             onNewWindowRequested: {
-                newWindow()
+                newWindow(newWindowRequestedUrl);
             }
         }
     }

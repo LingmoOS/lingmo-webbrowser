@@ -20,7 +20,15 @@ LingmoWindow{
     property FolderDialog folderDialog
     property ColorDialog colorDialog
     property ListModel downloadRequests
-    property int menuTriggerIndex: 10
+    property int menuTriggerIndex: 0
+    property list<LingmoMenuItem> targets: [contextMenuItem_back,contextMenuItem_forward,
+                    contextMenuItem_undo,contextMenuItem_redo,contextMenuItem_cut,contextMenuItem_copy,
+                    contextMenuItem_paste,contextMenuItem_paste_and_match_style,contextMenuItem_select_all,
+                    contextMenuItem_text_direction_ltr,contextMenuItem_text_direction_rtl,contextMenuItem_open_link_in_this_window,contextMenuItem_open_link_in_new_window,
+                    contextMenuItem_open_link_in_new_tab,contextMenuItem_copy_link_to_clipboard,contextMenuItem_download_link_to_disk,contextMenuItem_copy_image_to_clipboard,
+                    contextMenuItem_copy_image_url_to_clipboard,contextMenuItem_download_image_to_disk,contextMenuItem_copy_media_url_to_clipboard,contextMenuItem_toggle_media_controls,
+                    contextMenuItem_toggle_media_loop,contextMenuItem_toggle_media_play_pause,contextMenuItem_toggle_media_mute,contextMenuItem_download_media_to_disk,
+                    contextMenuItem_exit_fullscreen,contextMenuItem_save_page,contextMenuItem_view_source,contextMenuItem_inspect_element];
     property list<int> actions: [WebEngineView.Back,WebEngineView.Forward,
                     WebEngineView.Undo,WebEngineView.Redo,WebEngineView.Cut,WebEngineView.Copy,
                     WebEngineView.Paste,WebEngineView.PasteAndMatchStyle,WebEngineView.SelectAll,
@@ -29,7 +37,10 @@ LingmoWindow{
                     WebEngineView.CopyImageUrlToClipboard,WebEngineView.DownloadImageToDisk,WebEngineView.CopyMediaUrlToClipboard,WebEngineView.ToggleMediaControls,
                     WebEngineView.ToggleMediaLoop,WebEngineView.ToggleMediaPlayPause,WebEngineView.ToggleMediaMute,WebEngineView.DownloadMediaToDisk,
                     WebEngineView.ExitFullScreen,WebEngineView.SavePage,WebEngineView.ViewSource,WebEngineView.InspectElement];
+    property int contextMenuRequestViewId: 0
     signal newWindowRequested
+    property url newWindowRequestedUrl: SettingsData.homeUrl
+    property url initUrl: SettingsData.homeUrl
     function getSpecialTitle(url){
         if(url=="browser://collections"){
             return "Collections"
@@ -61,7 +72,7 @@ LingmoWindow{
         return tabId===web_tabView.currentItem.argument.id && window.active
     }
     Component.onCompleted: {
-        newTab();
+        newTab(initUrl);
         if(SettingsData.downloadPath==="undefined"){
             SettingsData.downloadPath=StandardPaths.writableLocation(StandardPaths.DownloadLocation).toString().replace("file:///", "");
         }
@@ -339,17 +350,26 @@ LingmoWindow{
                 }
                 onContextMenuRequested: function(request) {
                     request.accepted=true;
+                    contextMenuRequestViewId=argument.id;
                     context_menu.x=request.position.x;
                     context_menu.y=request.position.y+60;
-                    contextMenuItem_undo.visible=request.isContentEditable;
-                    contextMenuItem_redo.visible=request.isContentEditable;
-                    contextMenuItem_cut.visible=request.isContentEditable;
-                    contextMenuItem_copy.visible=request.isContentEditable;
-                    contextMenuItem_paste.visible=request.isContentEditable;
-                    contextMenuItem_paste_and_match_style.visible=request.isContentEditable;
-                    contextMenuItem_select_all.visible=request.isContentEditable;
-                    context_menu.contentData[13].visible=request.isContentEditable;
+                    for(var i=2;i<=10;i++){
+                        targets[i].visible=request.isContentEditable;
+                    }
                     contextMenuDivider_edit.visible=request.isContentEditable;
+                    for(var i=11;i<=15;i++){
+                        targets[i].visible=request.linkUrl!==Qt.url("");
+                    }
+                    contextMenuDivider_link.visible=request.linkUrl!==Qt.url("");
+                    for(var i=16;i<=18;i++){
+                        targets[i].visible=request.mediaUrl!==Qt.url("")&&request.mediaType==ContextMenuRequest.MediaTypeImage;
+                    }
+                    contextMenuDivider_image.visible=request.mediaUrl!==Qt.url("")&&request.mediaType==ContextMenuRequest.MediaTypeImage;
+                    for(var i=19;i<=24;i++){
+                        targets[i].visible=request.mediaUrl!==Qt.url("");
+                    }
+                    contextMenuDivider_media.visible=request.mediaUrl!==Qt.url("");
+                    context_menu.contentData[12].visible=request.isContentEditable;
                     contextMenuItem_undo.enabled=(request.editFlags&ContextMenuRequest.CanUndo);
                     contextMenuItem_redo.enabled=(request.editFlags&ContextMenuRequest.CanRedo);
                     contextMenuItem_cut.enabled=(request.editFlags&ContextMenuRequest.CanCut);
@@ -627,17 +647,17 @@ LingmoWindow{
                     target: hotkey_toggle_fullscreen
                     enabled: window.isCurrentTab(argument.id)
                     function onActivated(){
-                        if(is_fullscreen){
+                        if(webView_.is_fullscreen){
                             web_tabView.anchors.topMargin=30;
                             window.showNormal();
-                            is_fullscreen=false;
+                            webView_.is_fullscreen=false;
                         }
                         else{
                             web_tabView.anchors.topMargin=-35;
                             window.showFullScreen();
                             window.y=-31;
                             window.height+=31;
-                            is_fullscreen=true;
+                            webView_.is_fullscreen=true;
                         }
                     }
                 }
@@ -693,6 +713,22 @@ LingmoWindow{
                         webView_.url=SettingsData.homeUrl;
                     }
                 }
+                Connections{
+                    target: contextMenuItem_inspect_element
+                    enabled: window.isCurrentTab(argument.id)
+                    function onClicked() {
+                        webView_devtools.visible=true;
+                    }
+                }
+                Connections{
+                    target: contextMenuItem_exit_fullscreen
+                    enabled: window.isCurrentTab(argument.id)
+                    function onClicked(){
+                        web_tabView.anchors.topMargin=30;
+                        window.showNormal();
+                        webView_.is_fullscreen=false;
+                    }
+                }
                 Component.onCompleted: {
                     btn_back.enabled = canGoBack;
                     btn_forward.enabled = canGoForward;
@@ -706,18 +742,9 @@ LingmoWindow{
                     profile.persistentCookiesPolicy=WebEngineProfile.ForcePersistentCookies;
                     profile.cachePath=Qt.resolvedUrl(".").toString().replace("qml/global","data/cache").replace("file:///","");
                     profile.httpCacheType=WebEngineProfile.DiskHttpCache;
-                    var targets=[contextMenuItem_back,contextMenuItem_forward,
-                    contextMenuItem_undo,contextMenuItem_redo,contextMenuItem_cut,contextMenuItem_copy,
-                    contextMenuItem_paste,contextMenuItem_paste_and_match_style,contextMenuItem_select_all,
-                    contextMenuItem_text_direction_ltr,contextMenuItem_text_direction_rtl,contextMenuItem_open_link_in_this_window,contextMenuItem_open_link_in_new_window,
-                    contextMenuItem_open_link_in_new_tab,contextMenuItem_copy_link_to_clipboard,contextMenuItem_download_link_to_disk,contextMenuItem_copy_image_to_clipboard,
-                    contextMenuItem_copy_image_url_to_clipboard,contextMenuItem_download_image_to_disk,contextMenuItem_copy_media_url_to_clipboard,contextMenuItem_toggle_media_controls,
-                    contextMenuItem_toggle_media_loop,contextMenuItem_toggle_media_play_pause,contextMenuItem_toggle_media_mute,contextMenuItem_download_media_to_disk,
-                    contextMenuItem_exit_fullscreen,contextMenuItem_save_page,contextMenuItem_view_source,contextMenuItem_inspect_element];
                     for(var i=0;i<targets.length;i++){
                         targets[i].clicked.connect(function(){
                             if(window.isCurrentTab(argument.id)){
-                                print(actions[menuTriggerIndex])
                                 webView_.triggerWebAction(actions[menuTriggerIndex]);
                             }
                         })
@@ -851,19 +878,21 @@ LingmoWindow{
     LingmoMenu{
         id: context_menu
         width: 300
-        signal triggered
         LingmoMenuItem{
             id: contextMenuItem_back
             text: qsTr('Back')
             iconSource: LingmoIcons.Back
             onClicked:{
-                triggered(1)
+                window.menuTriggerIndex=0;
             }
         }
         LingmoMenuItem{
             id: contextMenuItem_forward
             text: qsTr('Forward')
             iconSource: LingmoIcons.Forward
+            onClicked:{
+                window.menuTriggerIndex=1;
+            }
         }
         LingmoMenuItem{
             id: contextMenuItem_reload_cancel
@@ -882,36 +911,57 @@ LingmoWindow{
             id: contextMenuItem_undo
             text: qsTr('Undo')
             iconSource: LingmoIcons.Undo
+            onClicked:{
+                window.menuTriggerIndex=2;
+            }
         }
         LingmoMenuItem{
             id: contextMenuItem_redo
             text: qsTr('Redo')
             iconSource: LingmoIcons.Redo
+            onClicked:{
+                window.menuTriggerIndex=3;
+            }
         }
         LingmoMenuItem{
             id: contextMenuItem_cut
             text: qsTr('Cut')
             iconSource: LingmoIcons.Cut
+            onClicked:{
+                window.menuTriggerIndex=4;
+            }
         }
         LingmoMenuItem{
             id: contextMenuItem_copy
             text: qsTr('Copy')
             iconSource: LingmoIcons.Copy
+            onClicked:{
+                window.menuTriggerIndex=5;
+            }
         }
         LingmoMenuItem{
             id: contextMenuItem_paste
             text: qsTr('Paste')
             iconSource: LingmoIcons.Paste
+            onClicked:{
+                window.menuTriggerIndex=6;
+            }
         }
         LingmoMenuItem{
             id: contextMenuItem_paste_and_match_style
             text: qsTr('Paste And Match Style')
             iconSource: LingmoIcons.Paste
+            onClicked:{
+                window.menuTriggerIndex=7;
+            }
         }
         LingmoMenuItem{
             id: contextMenuItem_select_all
             text: qsTr('Select All')
             iconSource: LingmoIcons.SelectAll
+            onClicked:{
+                window.menuTriggerIndex=8;
+            }
         }
         LingmoMenu{
             id: contextMenuItem_text_direction
@@ -921,11 +971,17 @@ LingmoWindow{
                 id: contextMenuItem_text_direction_ltr
                 text: qsTr('Change Text Direction Left To Right')
                 iconSource: LingmoIcons.ArrowRight8
+                onClicked:{
+                    window.menuTriggerIndex=9;
+                }
             }
             LingmoMenuItem{
                 id: contextMenuItem_text_direction_rtl
                 text: qsTr('Change Text Direction Right To Left')
                 iconSource: LingmoIcons.ArrowLeft8
+                onClicked:{
+                    window.menuTriggerIndex=10;
+                }
             }
         }
         LingmoDivider{
@@ -936,26 +992,41 @@ LingmoWindow{
             id: contextMenuItem_open_link_in_this_window
             text: qsTr('Open Link In This Window')
             iconSource: LingmoIcons.OpenPaneMirrored
+            onClicked:{
+                window.menuTriggerIndex=11;
+            }
         }
         LingmoMenuItem{
             id: contextMenuItem_open_link_in_new_window
             text: qsTr('Open Link In New Window')
             iconSource: LingmoIcons.OpenInNewWindow
+            onClicked:{
+                window.menuTriggerIndex=12;
+            }
         }
         LingmoMenuItem{
             id: contextMenuItem_open_link_in_new_tab
             text: qsTr('Open Link In New Tab')
             iconSource: LingmoIcons.OpenWith
+            onClicked:{
+                window.menuTriggerIndex=13;
+            }
         }
         LingmoMenuItem{
             id: contextMenuItem_copy_link_to_clipboard
             text: qsTr('Copy Link To Clipboard')
             iconSource: LingmoIcons.CopyTo
+            onClicked:{
+                window.menuTriggerIndex=14;
+            }
         }
         LingmoMenuItem{
             id: contextMenuItem_download_link_to_disk
             text: qsTr('Download Link To Disk')
             iconSource: LingmoIcons.Download
+            onClicked:{
+                window.menuTriggerIndex=15;
+            }
         }
         LingmoDivider{
             id: contextMenuDivider_link
@@ -965,16 +1036,25 @@ LingmoWindow{
             id: contextMenuItem_copy_image_to_clipboard
             text: qsTr('Copy Image To Clipboard')
             iconSource: LingmoIcons.CopyTo
+            onClicked:{
+                window.menuTriggerIndex=16;
+            }
         }
         LingmoMenuItem{
             id: contextMenuItem_copy_image_url_to_clipboard
             text: qsTr('Copy Image Url To Clipboard')
             iconSource: LingmoIcons.CopyTo
+            onClicked:{
+                window.menuTriggerIndex=17;
+            }
         }
         LingmoMenuItem{
             id: contextMenuItem_download_image_to_disk
             text: qsTr('Download Image To Disk')
             iconSource: LingmoIcons.Download
+            onClicked:{
+                window.menuTriggerIndex=18;
+            }
         }
         LingmoDivider{
             id: contextMenuDivider_image
@@ -984,31 +1064,49 @@ LingmoWindow{
             id: contextMenuItem_copy_media_url_to_clipboard
             text: qsTr('Copy Media Url To Clipboard')
             iconSource: LingmoIcons.Download
+            onClicked:{
+                window.menuTriggerIndex=19;
+            }
         }
         LingmoMenuItem{
             id: contextMenuItem_toggle_media_controls
             text: qsTr('Toggle Media Controls')
             iconSource: LingmoIcons.CallControl
+            onClicked:{
+                window.menuTriggerIndex=20;
+            }
         }
         LingmoMenuItem{
             id: contextMenuItem_toggle_media_loop
             text: qsTr('Toggle Media Loop')
             iconSource: LingmoIcons.RestartUpdate
+            onClicked:{
+                window.menuTriggerIndex=21;
+            }
         }
         LingmoMenuItem{
             id: contextMenuItem_toggle_media_play_pause
             text: qsTr('Toggle Media Play Pause')
             iconSource: LingmoIcons.Play
+            onClicked:{
+                window.menuTriggerIndex=22;
+            }
         }
         LingmoMenuItem{
             id: contextMenuItem_toggle_media_mute
             text: qsTr('Toggle Media Mute')
             iconSource: LingmoIcons.Mute
+            onClicked:{
+                window.menuTriggerIndex=23;
+            }
         }
         LingmoMenuItem{
             id: contextMenuItem_download_media_to_disk
             text: qsTr('Download Media To Disk')
             iconSource: LingmoIcons.Download
+            onClicked:{
+                window.menuTriggerIndex=24;
+            }
         }
         LingmoDivider{
             id: contextMenuDivider_media
@@ -1018,6 +1116,9 @@ LingmoWindow{
             id: contextMenuItem_exit_fullscreen
             text: qsTr("Exit Fullescreen")
             iconSource: LingmoIcons.BackToWindow
+            onClicked:{
+                window.menuTriggerIndex=25;
+            }
         }
         LingmoDivider{
             orientation: Qt.Horizontal
@@ -1026,6 +1127,9 @@ LingmoWindow{
             id: contextMenuItem_save_page
             text: qsTr("Save Page")
             iconSource: LingmoIcons.Save
+            onClicked:{
+                window.menuTriggerIndex=26;
+            }
         }
         LingmoDivider{
             orientation: Qt.Horizontal
@@ -1034,11 +1138,17 @@ LingmoWindow{
             id: contextMenuItem_view_source
             text: qsTr("View Source")
             iconSource: LingmoIcons.Code
+            onClicked:{
+                window.menuTriggerIndex=27;
+            }
         }
         LingmoMenuItem{
             id: contextMenuItem_inspect_element
             text: qsTr("Inspect Element")
             iconSource: LingmoIcons.NewWindow
+            onClicked:{
+                window.menuTriggerIndex=28;
+            }
         }
         onAboutToHide: {
             contextMenuItem_text_direction.close();
@@ -1164,19 +1274,19 @@ LingmoWindow{
             anchors.margins: 10
             spacing: 10
             LingmoText{
-                text: dialog_request_popup.request.securityOrigin + qsTr(" Displays")
+                text: dialog_request_popup.request ? dialog_request_popup.request.securityOrigin + qsTr(" Displays") : ""
                 font: LingmoTextStyle.BodyStrong
             }
             LingmoText{
-                text: dialog_request_popup.request.message
+                text: dialog_request_popup.request ? dialog_request_popup.request.message : ""
                 wrapMode: Text.WordWrap
                 font: LingmoTextStyle.Body
                 Layout.preferredWidth: parent.width-10
             }
             LingmoTextBox{
                 id: dialog_entry
-                visible: dialog_request_popup.request.type===JavaScriptDialogRequest.DialogTypePrompt
-                placeholderText: dialog_request_popup.request.defaultText
+                visible: dialog_request_popup.request && dialog_request_popup.request.type===JavaScriptDialogRequest.DialogTypePrompt
+                placeholderText: dialog_request_popup.request ? dialog_request_popup.request.defaultText : ""
                 Layout.fillWidth: true
                 cleanEnabled: false
             }
@@ -1187,7 +1297,7 @@ LingmoWindow{
                     text: qsTr("OK")
                     Layout.alignment: Qt.AlignRight
                     onClicked: {
-                        if(dialog_request_popup.request.type===JavaScriptDialogRequest.DialogTypePrompt){
+                        if(dialog_request_popup.request && dialog_request_popup.request.type===JavaScriptDialogRequest.DialogTypePrompt){
                             dialog_request_popup.request.dialogAccept(dialog_entry.text);
                         }
                         else{
@@ -1199,9 +1309,9 @@ LingmoWindow{
                 LingmoButton{
                     text: qsTr("Cancel")
                     Layout.alignment: Qt.AlignRight
-                    visible: dialog_request_popup.request.type===JavaScriptDialogRequest.DialogTypePrompt || 
+                    visible: dialog_request_popup.request &&(dialog_request_popup.request.type===JavaScriptDialogRequest.DialogTypePrompt || 
                                 dialog_request_popup.request.type===JavaScriptDialogRequest.DialogTypeConfirm ||
-                                dialog_request_popup.request.type===JavaScriptDialogRequest.DialogTypeBeforeUnload
+                                dialog_request_popup.request.type===JavaScriptDialogRequest.DialogTypeBeforeUnload)
                     onClicked: {
                         dialog_request_popup.request.dialogReject()
                         dialog_request_popup.close();

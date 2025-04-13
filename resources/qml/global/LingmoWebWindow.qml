@@ -39,8 +39,8 @@ LingmoWindow{
                     WebEngineView.ExitFullScreen,WebEngineView.SavePage,WebEngineView.ViewSource,WebEngineView.InspectElement];
     property int contextMenuRequestViewId: 0
     signal newWindowRequested
-    property url newWindowRequestedUrl: SettingsData.homeUrl
-    property url initUrl: SettingsData.homeUrl
+    property WebEngineView newWindowFirstView
+    property WebEngineNewWindowRequest newWindowRequest
     function getSpecialTitle(url){
         if(url=="browser://collections"){
             return "Collections"
@@ -72,7 +72,7 @@ LingmoWindow{
         return tabId===web_tabView.currentItem.argument.id && window.active
     }
     Component.onCompleted: {
-        newTab(initUrl);
+        newTab();
         if(SettingsData.downloadPath==="undefined"){
             SettingsData.downloadPath=StandardPaths.writableLocation(StandardPaths.DownloadLocation).toString().replace("file:///", "");
         }
@@ -370,6 +370,8 @@ LingmoWindow{
                     }
                     contextMenuDivider_media.visible=request.mediaUrl!==Qt.url("");
                     context_menu.contentData[12].visible=request.isContentEditable;
+                    contextMenuItem_exit_fullscreen.visible=webView_.is_fullscreen||webView_.isFullScreen;
+                    contextMenuDivider_exit_fullscreen.visible=webView_.is_fullscreen||webView_.isFullScreen;
                     contextMenuItem_undo.enabled=(request.editFlags&ContextMenuRequest.CanUndo);
                     contextMenuItem_redo.enabled=(request.editFlags&ContextMenuRequest.CanRedo);
                     contextMenuItem_cut.enabled=(request.editFlags&ContextMenuRequest.CanCut);
@@ -526,7 +528,24 @@ LingmoWindow{
                 //     }
                 // }
                 onNewWindowRequested: function(request) {
-                    window.newTab(request.requestedUrl);
+                    switch(request.destination){
+                        case WebEngineNewWindowRequest.InNewTab:
+                            window.newTab(request.requestedUrl);
+                            break;
+                        case WebEngineNewWindowRequest.InNewWindow:{
+                            newWindowRequest=request;
+                            window.newWindowRequested();
+                            break;
+                        }
+                        case WebEngineNewWindowRequest.InNewDialog:{
+                            break;
+                        }
+                        case WebEngineNewWindowRequest.InNewBackgroundTab:{
+                            break;
+                        }
+
+                    }
+
                 }
                 onPrintRequested: {
 
@@ -730,6 +749,7 @@ LingmoWindow{
                     }
                 }
                 Component.onCompleted: {
+                    newWindowFirstView=webView_;
                     btn_back.enabled = canGoBack;
                     btn_forward.enabled = canGoForward;
                     btn_reload.iconSource=loading ? LingmoIcons.Cancel : LingmoIcons.Refresh ;
@@ -990,7 +1010,7 @@ LingmoWindow{
         }
         LingmoMenuItem{
             id: contextMenuItem_open_link_in_this_window
-            text: qsTr('Open Link In This Window')
+            text: qsTr('Open Link In This Tab')
             iconSource: LingmoIcons.OpenPaneMirrored
             onClicked:{
                 window.menuTriggerIndex=11;
@@ -1121,6 +1141,7 @@ LingmoWindow{
             }
         }
         LingmoDivider{
+            id: contextMenuDivider_exit_fullscreen
             orientation: Qt.Horizontal
         }
         LingmoMenuItem{

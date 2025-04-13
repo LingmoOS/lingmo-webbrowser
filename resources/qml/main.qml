@@ -10,17 +10,19 @@ import global
 LingmoObject {
     id: root
     Component.onCompleted: {
-        LingmoApp.init(root, Qt.locale("zh_CN"));
+        LingmoApp.init(root, Qt.locale("en_US"));
         LingmoTheme.animationEnabled = true;
         LingmoTheme.blurBehindWindowEnabled = true;
         LingmoTheme.darkMode = LingmoThemeType.System;
         newWindow();
     }
-    property url newInitUrl: SettingsData.homeUrl
-    function newWindow(requestedUrl){
+    property WebEngineView newWindowView
+    function newWindow(request){
         var new_window=com_web_window.createObject(null,{});
         new_window.show();
-        newInitUrl=requestedUrl
+        if(request){
+            newWindowView.acceptAsNewWindow(request);
+        }
     }
     ListModel{
         id: download_requests
@@ -32,9 +34,11 @@ LingmoObject {
             folderDialog: folder_dialog
             colorDialog: color_dialog
             downloadRequests: download_requests
-            initUrl: newInitUrl
             onNewWindowRequested: {
-                newWindow(newWindowRequestedUrl);
+                newWindow(newWindowRequest);
+            }
+            Component.onCompleted: {
+                newWindowView=newWindowFirstView;
             }
         }
     }

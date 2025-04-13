@@ -15,8 +15,7 @@ Item {
 
     Rectangle {
         anchors.fill: parent
-        color: LingmoTheme.darkMode ? Qt.lighter(LingmoTheme.backgroundColor, 1.5)
-                                     : Qt.darker(LingmoTheme.backgroundColor, 1.05)
+        color: LingmoTheme.darkMode ? Qt.lighter(LingmoTheme.backgroundColor, 1.5) : Qt.darker(LingmoTheme.backgroundColor, 1.05)
         opacity: Window.window.compositing ? 0.3 : 0.4
         Behavior on color {
             ColorAnimation {

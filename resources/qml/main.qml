@@ -17,12 +17,23 @@ LingmoObject {
         newWindow();
     }
     property WebEngineView newWindowView
+    property WebEngineView newDialogView
     function newWindow(request){
         var new_window=com_web_window.createObject(null,{});
-        new_window.show();
         if(request){
             newWindowView.acceptAsNewWindow(request);
+            newWindowView.hidePages();
         }
+        new_window.show();
+    }
+    function newDialog(request){
+        var new_dialog=com_web_dialog.createObject(null,{});
+        if(request){
+            newDialogView.acceptAsNewWindow(request);
+            newDialogView.hidePages();
+            newDialogView.resizeByRequest(request);
+        }
+        new_dialog.show();
     }
     ListModel{
         id: download_requests
@@ -37,8 +48,29 @@ LingmoObject {
             onNewWindowRequested: {
                 newWindow(newWindowRequest);
             }
+            onNewDialogRequested: {
+                newDialog(newWindowRequest);
+            }
             Component.onCompleted: {
                 newWindowView=newWindowFirstView;
+            }
+        }
+    }
+    Component{
+        id: com_web_dialog
+        LingmoWebDialog{
+            fileDialog: file_dialog
+            folderDialog: folder_dialog
+            colorDialog: color_dialog
+            downloadRequests: download_requests
+            onNewWindowRequested: {
+                newWindow(newWindowRequest);
+            }
+            onNewDialogRequested: {
+                newDialog(newWindowRequest);
+            }
+            Component.onCompleted: {
+                newDialogView=webView;
             }
         }
     }

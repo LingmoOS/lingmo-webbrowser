@@ -39,6 +39,7 @@ LingmoWindow{
                     WebEngineView.ExitFullScreen,WebEngineView.SavePage,WebEngineView.ViewSource,WebEngineView.InspectElement];
     property int contextMenuRequestViewId: 0
     signal newWindowRequested
+    signal newDialogRequested
     property WebEngineView newWindowFirstView
     property WebEngineNewWindowRequest newWindowRequest
     function getSpecialTitle(url){
@@ -64,8 +65,8 @@ LingmoWindow{
             return "New Tab"
         }
     }
-    function newTab(url= SettingsData.homeUrl){
-        web_tabView.appendTab("qrc:/images/browser.svg",qsTr(getSpecialTitle(url)),com_webView,{"url": url,"id": webViewId},true);
+    function newTab(url= SettingsData.homeUrl,autoSwitch=true){
+        web_tabView.appendTab("qrc:/images/browser.svg",qsTr(getSpecialTitle(url)),com_webView,{"url": url,"id": webViewId},autoSwitch);
         webViewId+=1;
     }
     function isCurrentTab(tabId){
@@ -541,14 +542,15 @@ LingmoWindow{
                             break;
                         }
                         case WebEngineNewWindowRequest.InNewDialog:{
+                            newWindowRequest=request;
+                            window.newDialogRequested();
                             break;
                         }
                         case WebEngineNewWindowRequest.InNewBackgroundTab:{
+                            window.newTab(request.requestedUrl,false);
                             break;
                         }
-
                     }
-
                 }
                 onPrintRequested: {
 
@@ -767,7 +769,7 @@ LingmoWindow{
                     profile.httpCacheType=WebEngineProfile.DiskHttpCache;
                     for(var i=0;i<targets.length;i++){
                         targets[i].clicked.connect(function(){
-                            if(window.isCurrentTab(argument.id)){
+                            if(argument&&window.isCurrentTab(argument.id)){
                                 webView_.triggerWebAction(actions[menuTriggerIndex]);
                             }
                         })
@@ -802,6 +804,14 @@ LingmoWindow{
                     id: start_page
                     visible: argument.url=="browser://start"
                     z: 32767
+                }
+                function hidePages(){
+                    collections_page.visible=false;
+                    download_page.visible=false;
+                    extension_page.visible=false;
+                    history_page.visible=false;
+                    settings_page.visible=false;
+                    start_page.visible=false;
                 }
             }
             WebEngineView{

@@ -69,7 +69,10 @@ LingmoWindow{
         webViewId+=1;
     }
     function isCurrentTab(tabId){
-        return tabId===web_tabView.currentItem.argument.id && window.active
+        if(web_tabView.currentItem){
+            return tabId===web_tabView.currentItem.argument.id && window.active;
+        }
+        return false;
     }
     Component.onCompleted: {
         newTab();

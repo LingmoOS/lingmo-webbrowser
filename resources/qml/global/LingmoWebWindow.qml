@@ -553,7 +553,7 @@ LingmoWindow{
                     }
                 }
                 onPrintRequested: {
-
+                    
                 }
                 onRegisterProtocolHandlerRequested: {
 
@@ -607,6 +607,11 @@ LingmoWindow{
                     window.downloadRequests.append({"request": request,"id": request.id,"profile": profile})
                     request.accept();
                     download_popup.open();
+                }
+                profile.onPresentNotification: function(request){
+                    // system_tray_icon.request=request;
+                    // system_tray_icon.showMessage(request.title,request.message,webView_.icon);
+                    // request.show();
                 }
                 Connections{
                     target: btn_back
@@ -805,6 +810,19 @@ LingmoWindow{
                     visible: argument.url=="browser://start"
                     z: 32767
                 }
+                // SystemTrayIcon{
+                //     id: system_tray_icon
+                //     visible: false
+                //     property WebEngineNotification request
+                //     onMessageClicked: {
+                //         request.click();
+                //     }
+                //     onVisibleChanged: {
+                //         if(visible==false){
+                //             request.close();
+                //         }
+                //     }
+                // }
                 function hidePages(){
                     collections_page.visible=false;
                     download_page.visible=false;
@@ -1312,7 +1330,7 @@ LingmoWindow{
                 font: LingmoTextStyle.BodyStrong
             }
             LingmoText{
-                text: dialog_request_popup.request ? dialog_request_popup.request.message : ""
+                text: dialog_request_popup.request ? (dialog_request_popup.request.type===JavaScriptDialogRequest.DialogTypeBeforeUnload ? "Are you sure you want to leave this page? The changes you have made may not be saved." : dialog_request_popup.request.message ): ""
                 wrapMode: Text.WordWrap
                 font: LingmoTextStyle.Body
                 Layout.preferredWidth: parent.width-10

@@ -110,4 +110,4 @@ class UrlSchemeHandler(QWebEngineUrlSchemeHandler):
         super().__init__()
 
     def requestStarted(self, job: QWebEngineUrlRequestJob):
-        job.fail(QWebEngineUrlRequestJob.Error.NoError)
+        job.reply(QByteArray("text/html"),job.requestBody())

@@ -6,7 +6,7 @@ import QtQml
 import QtCore
 import QtWebEngine
 import LingmoUI
-import Qt.labs.platform
+import Qt.labs.platform as QLPF
 import org.lingmo.webbrowser
 import pages
 import popups
@@ -44,22 +44,22 @@ LingmoWindow{
     property WebEngineView newWindowFirstView
     property WebEngineNewWindowRequest newWindowRequest
     function getSpecialTitle(url){
-        if(url=="browser://collections/"){
+        if(url=="browser://collections/"||url=="browser://collections"){
             return "Collections"
         }
-        else if(url=="browser://downloads/"){
+        else if(url=="browser://downloads/"||url=="browser://downloads"){
             return "Downloads"
         }
-        else if(url=="browser://extensions/"){
+        else if(url=="browser://extensions/"||url=="browser://extensions"){
             return "Extensions"
         }
-        else if(url=="browser://history/"){
+        else if(url=="browser://history/"||url=="browser://history"){
             return "History"
         }
-        else if(url=="browser://settings/"){
+        else if(url=="browser://settings/"||url=="browser://settings"){
             return "Settings"
         }
-        else if(url=="browser://start/"){
+        else if(url=="browser://start/"||url=="browser://start"){
             return "Start Page"
         }
         else{
@@ -560,7 +560,12 @@ LingmoWindow{
 
                 }
                 onTitleChanged:{
-                    web_tabView.get(now_index()).text=title;
+                    if(window.getSpecialTitle(url)==="New Tab"){
+                        web_tabView.get(now_index()).text=title;
+                    }
+                    else{
+                        web_tabView.get(now_index()).text=window.getSpecialTitle(url);
+                    }
                 }
                 onTooltipRequested: function(request){
                     request.accepted=true;
@@ -617,6 +622,8 @@ LingmoWindow{
                 }
                 profile.onPresentNotification: function(request){
                     system_tray_icon.request=request;
+                    system_tray_icon.visible=true;
+                    system_tray_icon.icon.source="qrc:/images/tray-icon.png";
                     system_tray_icon.showMessage(request.title,request.message,webView_.icon);
                     request.show();
                 }
@@ -816,19 +823,6 @@ LingmoWindow{
                     id: start_page
                     visible: argument.url=="browser://start/"
                     z: 32767
-                }
-                SystemTrayIcon{
-                    id: system_tray_icon
-                    visible: false
-                    property WebEngineNotification request
-                    onMessageClicked: {
-                        request.click();
-                    }
-                    onVisibleChanged: {
-                        if(visible==false){
-                            request.close();
-                        }
-                    }
                 }
                 function hidePages(){
                     collections_page.visible=false;
@@ -1388,5 +1382,20 @@ LingmoWindow{
         id: hotkey_open_devTools
         name: qsTr("Open Dev Tools")
         sequence: "Alt+F12"
+    }
+    QLPF.SystemTrayIcon{
+        id: system_tray_icon
+        property WebEngineNotification request
+        onMessageClicked: {
+            request.click();
+        }
+        onVisibleChanged: {
+            if(visible==false){
+                request.close();
+            }
+        }
+        visible: true
+        
+        icon.source: "qrc:/images/browser.svg"
     }
 }

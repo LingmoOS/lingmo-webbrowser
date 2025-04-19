@@ -556,8 +556,9 @@ LingmoWindow{
                 onPrintRequested: {
                     
                 }
-                onRegisterProtocolHandlerRequested: {
-
+                onRegisterProtocolHandlerRequested: function(request){
+                    register_protocol_handler_request_popup.request=reqeust;
+                    register_protocol_handler_request_popup.open();
                 }
                 onTitleChanged:{
                     if(window.getSpecialTitle(url)==="New Tab"){
@@ -1368,6 +1369,50 @@ LingmoWindow{
                     onClicked: {
                         dialog_request_popup.request.dialogReject()
                         dialog_request_popup.close();
+                    }
+                }
+            }
+        }
+    }
+    LingmoPopup{
+        id: register_protocol_handler_request_popup
+        x: {return window.width-width-10}
+        y: {return window.appBar.height+toolArea.height}
+        width: 400
+        padding: 10
+        bottomPadding: 20
+        modal: false
+        property var request
+        ColumnLayout{
+            anchors.fill: parent
+            anchors.margins: 10
+            spacing: 10
+            LingmoText{
+                text: register_protocol_handler_request_popup.request ? register_protocol_handler_request_popup.request.origin : ""
+                font: LingmoTextStyle.BodyStrong
+            }
+            LingmoText{
+                text: qsTr("Requests Register Protocol Handler")
+                font: LingmoTextStyle.Body
+                Layout.preferredWidth: parent.width-10
+            }
+            RowLayout{
+                spacing: 10
+                Layout.alignment: Qt.AlignRight
+                LingmoFilledButton{
+                    text: qsTr("Accept")
+                    Layout.alignment: Qt.AlignRight
+                    onClicked: {
+                        register_protocol_handler_request_popup.request.accept();
+                        register_protocol_handler_request_popup.close();
+                    }
+                }
+                LingmoButton{
+                    text: qsTr("Reject")
+                    Layout.alignment: Qt.AlignRight
+                    onClicked: {
+                        register_protocol_handler_request_popup.request.reject()
+                        register_protocol_handler_request_popup.close();
                     }
                 }
             }

@@ -5,3 +5,4 @@ The built-in webbrowser of Lingmo OS,a part of Lingmo DE.
 - no support for saving cookies.
 - no complete support for the native beforeunload dialog.
 - zoom function have issues.
+- no support for printing.

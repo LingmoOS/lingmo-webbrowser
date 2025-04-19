@@ -4,6 +4,7 @@ import QtQuick.Layouts
 import QtQuick.Dialogs
 import QtWebEngine
 import LingmoUI
+import Qt.labs.platform
 import org.lingmo.webbrowser
 import global
 

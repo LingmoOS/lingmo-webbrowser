@@ -6,6 +6,7 @@ import QtQml
 import QtCore
 import QtWebEngine
 import LingmoUI
+import Qt.labs.platform
 import org.lingmo.webbrowser
 import pages
 import popups
@@ -43,22 +44,22 @@ LingmoWindow{
     property WebEngineView newWindowFirstView
     property WebEngineNewWindowRequest newWindowRequest
     function getSpecialTitle(url){
-        if(url=="browser://collections"){
+        if(url=="browser://collections/"){
             return "Collections"
         }
-        else if(url=="browser://downloads"){
+        else if(url=="browser://downloads/"){
             return "Downloads"
         }
-        else if(url=="browser://extensions"){
+        else if(url=="browser://extensions/"){
             return "Extensions"
         }
-        else if(url=="browser://history"){
+        else if(url=="browser://history/"){
             return "History"
         }
-        else if(url=="browser://settings"){
+        else if(url=="browser://settings/"){
             return "Settings"
         }
-        else if(url=="browser://start"){
+        else if(url=="browser://start/"){
             return "Start Page"
         }
         else{
@@ -293,7 +294,7 @@ LingmoWindow{
                 text: qsTr('Settings')
                 radius: LingmoUnits.windowRadius
                 onClicked: {
-                    window.newTab("browser://settings")
+                    window.newTab("browser://settings/")
                 }
             }
             LingmoIconButton {
@@ -569,6 +570,12 @@ LingmoWindow{
                     toolTip.requestType=request.type;
                 }
                 onUrlChanged: {
+                    collections_page.visible=(webView_.url=="browser://collections/");
+                    download_page.visible=(webView_.url=="browser://downloads/");
+                    extension_page.visible=(webView_.url=="browser://extensions/");
+                    history_page.visible=(webView_.url=="browser://history/");
+                    settings_page.visible=(webView_.url=="browser://settings/");
+                    start_page.visible=(webView_.url=="browser://start/");
                     if(collections_page.visible){
                         return;
                     }
@@ -609,9 +616,9 @@ LingmoWindow{
                     download_popup.open();
                 }
                 profile.onPresentNotification: function(request){
-                    // system_tray_icon.request=request;
-                    // system_tray_icon.showMessage(request.title,request.message,webView_.icon);
-                    // request.show();
+                    system_tray_icon.request=request;
+                    system_tray_icon.showMessage(request.title,request.message,webView_.icon);
+                    request.show();
                 }
                 Connections{
                     target: btn_back
@@ -656,12 +663,12 @@ LingmoWindow{
                         argument.url=text;
                         webView_.url=text;
                         forceActiveFocus();
-                        collections_page.visible=(webView_.url=="browser://collections");
-                        download_page.visible=(webView_.url=="browser://downloads");
-                        extension_page.visible=(webView_.url=="browser://extensions");
-                        history_page.visible=(webView_.url=="browser://history");
-                        settings_page.visible=(webView_.url=="browser://settings");
-                        start_page.visible=(webView_.url=="browser://start");
+                        collections_page.visible=(webView_.url=="browser://collections/");
+                        download_page.visible=(webView_.url=="browser://downloads/");
+                        extension_page.visible=(webView_.url=="browser://extensions/");
+                        history_page.visible=(webView_.url=="browser://history/");
+                        settings_page.visible=(webView_.url=="browser://settings/");
+                        start_page.visible=(webView_.url=="browser://start/");
                         web_tabView.setCurrentText(window.getSpecialTitle(text))
                     }
                 }
@@ -782,47 +789,47 @@ LingmoWindow{
                 }
                 Collections{
                     id: collections_page
-                    visible: argument.url=="browser://collections"
+                    visible: argument.url=="browser://collections/"
                     z: 32767
                 }
                 Downloads{
                     id: download_page
-                    visible: argument.url=="browser://downloads"
+                    visible: argument.url=="browser://downloads/"
                     z: 32767
                 }
                 Extensions{
                     id: extension_page
-                    visible: argument.url=="browser://extensions"
+                    visible: argument.url=="browser://extensions/"
                     z: 32767
                 }
                 History{
                     id: history_page
-                    visible: argument.url=="browser://history"
+                    visible: argument.url=="browser://history/"
                     z: 32767
                 }
                 Settings{
                     id: settings_page
-                    visible: argument.url=="browser://settings"
+                    visible: argument.url=="browser://settings/"
                     z: 32767
                 }
                 StartPage{
                     id: start_page
-                    visible: argument.url=="browser://start"
+                    visible: argument.url=="browser://start/"
                     z: 32767
                 }
-                // SystemTrayIcon{
-                //     id: system_tray_icon
-                //     visible: false
-                //     property WebEngineNotification request
-                //     onMessageClicked: {
-                //         request.click();
-                //     }
-                //     onVisibleChanged: {
-                //         if(visible==false){
-                //             request.close();
-                //         }
-                //     }
-                // }
+                SystemTrayIcon{
+                    id: system_tray_icon
+                    visible: false
+                    property WebEngineNotification request
+                    onMessageClicked: {
+                        request.click();
+                    }
+                    onVisibleChanged: {
+                        if(visible==false){
+                            request.close();
+                        }
+                    }
+                }
                 function hidePages(){
                     collections_page.visible=false;
                     download_page.visible=false;
@@ -922,7 +929,7 @@ LingmoWindow{
             text: qsTr('Settings')
             iconSource: LingmoIcons.Settings
             onClicked: {
-                window.newTab("browser://settings")
+                window.newTab("browser://settings/")
             }
         }
     }

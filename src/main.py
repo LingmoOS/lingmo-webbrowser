@@ -5,7 +5,11 @@ from data import SettingsData, DownloadHistoryData
 import updRes
 import LingmoUIPy
 import res
-
+try:
+    from ctypes import windll
+    windll.shell32.SetCurrentProcessExplicitAppUserModelID('org.lingmo.webbrowser')
+except ImportError:
+    pass
 if __name__ == "__main__":
     os.environ["QTWEBENGINE_REMOTE_DEBUGGING"] = "1112"
     scheme = QWebEngineUrlScheme(QByteArray("browser"))
@@ -14,6 +18,7 @@ if __name__ == "__main__":
     scheme.setFlags(QWebEngineUrlScheme.Flag.SecureScheme)
     QWebEngineUrlScheme.registerScheme(scheme)
     app = QGuiApplication(sys.argv)
+    app.setWindowIcon(QIcon(":/images/browser.svg"))
     qmlRegisterSingletonType(
         SettingsData, "org.lingmo.webbrowser", 1, 0, "SettingsData"
     )

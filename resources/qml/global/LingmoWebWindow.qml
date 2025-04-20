@@ -15,7 +15,7 @@ LingmoWindow{
     id: window
     visible: true
     width: 1000
-    height: 600
+    height: 600 
     property int webViewId: 0
     property FileDialog fileDialog
     property FolderDialog folderDialog
@@ -276,9 +276,6 @@ LingmoWindow{
                 iconSize: 15
                 text: qsTr('Find on Page')
                 radius: LingmoUnits.windowRadius
-                onClicked: {
-                    find_on_page_popup.open()
-                }
             }
             LingmoIconButton {
                 id: btn_settings
@@ -333,8 +330,10 @@ LingmoWindow{
                 url: argument.url
                 property bool is_fullscreen: false
                 property real prev_zoomFactor: 1.0
-                onAuthenticationDialogRequested: {
-                    
+                onAuthenticationDialogRequested: function(request){
+                    request.accepted=true;
+                    authentication_request_popup.request=request;
+                    authentication_request_popup.open();
                 }
                 onCanGoBackChanged: {
                     btn_back.enabled = canGoBack
@@ -344,7 +343,10 @@ LingmoWindow{
                     btn_forward.enabled = canGoForward
                     contextMenuItem_forward.enabled = canGoForward
                 }
-                onCertificateError:{
+                onCertificateError: function(request){
+                    request.defer();
+                    certificate_error_popup.request=request;
+                    certificate_error_popup.open();
 
                 }
                 onColorDialogRequested: function(request){
@@ -453,9 +455,6 @@ LingmoWindow{
                 onFileSystemAccessRequested: function(request){
                     request.accept();
                 }
-                onFindTextFinished: {
-                    
-                }
                 onFullScreenRequested: function(request){
                     if(!is_fullscreen){
                         if(request.toggleOn){
@@ -500,38 +499,6 @@ LingmoWindow{
                         web_tabView.setCurrentTabIcon("qrc:/images/browser.svg")
                     }
                 }
-                // onNavigationRequested: function(request){
-                //     switch(request.navigationType){
-                //         case WebEngineNavigationRequest.LinkClickedNavigation: {
-                //             print('Link Clicked Navigation');
-                //             break;
-                //         }
-                //         case WebEngineNavigationRequest.TypedNavigation: {
-                //             print('Typed Navigation');
-                //             break;
-                //         }
-                //         case WebEngineNavigationRequest.FormSubmittedNavigation: {
-                //             print('Form Submitted Navigation');
-                //             break;
-                //         }
-                //         case WebEngineNavigationRequest.BackForwardNavigation: {
-                //             print('Back/Forward Navigation');
-                //             break;
-                //         }
-                //         case WebEngineNavigationRequest.ReloadNavigation: {
-                //             print('Reload Navigation');
-                //             break;
-                //         }
-                //         case WebEngineNavigationRequest.RedirectNavigation: {
-                //             print('Redirect Navigation');
-                //             break;
-                //         }
-                //         case WebEngineNavigationRequest.OtherNavigation: {
-                //             print('Other Navigation');
-                //             break;
-                //         }
-                //     }
-                // }
                 onNewWindowRequested: function(request) {
                     switch(request.destination){
                         case WebEngineNewWindowRequest.InNewTab:
@@ -555,6 +522,9 @@ LingmoWindow{
                 }
                 onPrintRequested: {
                     
+                }
+                onRecommendedStateChanged: {
+                    lifecycleState=recommendedState;
                 }
                 onRegisterProtocolHandlerRequested: function(request){
                     register_protocol_handler_request_popup.request=reqeust;
@@ -601,9 +571,6 @@ LingmoWindow{
                         return;
                     }
                     urlLine.text = url
-                }
-                onWebAuthUxRequested: {
-                    
                 }
                 onWindowCloseRequested: {
                     web_tabView.closeTab(web_tabView.currentIndex);
@@ -685,6 +652,14 @@ LingmoWindow{
                     enabled: window.isCurrentTab(argument.id)
                     function onCurrentIndexChanged(){
                         urlLine.text=webView_.url
+                    }
+                }
+                Connections{
+                    target: btn_find
+                    enabled: window.isCurrentTab(argument.id)
+                    function onClicked(){
+                        find_on_page_popup.open();
+                        find_on_page_popup.is_opened=true;
                     }
                 }
                 Connections{
@@ -824,6 +799,13 @@ LingmoWindow{
                     id: start_page
                     visible: argument.url=="browser://start/"
                     z: 32767
+                }
+                FindOnPagePopup{
+                    id: find_on_page_popup
+                    parentView: webView_
+                    x: {return btn_find.x+contorlRightButtons.x+btn_download.width-width}
+                    y: {return window.appBar.height+toolArea.height}
+                    visible: window.isCurrentTab(argument.id) && is_opened
                 }
                 function hidePages(){
                     collections_page.visible=false;
@@ -1249,12 +1231,6 @@ LingmoWindow{
         x: {return btn_extensions.x+contorlRightButtons.x+btn_download.width-width}
         y: {return window.appBar.height+toolArea.height}
     }
-    FindOnPagePopup{
-        id: find_on_page_popup
-        parentWindow: window
-        x: {return btn_find.x+contorlRightButtons.x+btn_download.width-width}
-        y: {return window.appBar.height+toolArea.height}
-    }
     HistoryPopup{
         id: history_popup
         parentWindow: window
@@ -1413,6 +1389,96 @@ LingmoWindow{
                     onClicked: {
                         register_protocol_handler_request_popup.request.reject()
                         register_protocol_handler_request_popup.close();
+                    }
+                }
+            }
+        }
+    }
+    LingmoPopup{
+        id: authentication_request_popup
+        width: 400
+        padding: 10
+        bottomPadding: 20
+        modal: false
+        property AuthenticationDialogRequest request
+        ColumnLayout{
+            anchors.fill: parent
+            anchors.margins: 10
+            spacing: 10
+            LingmoText{
+                text: authentication_request_popup.request ? authentication_request_popup.request.url + qsTr(" Requests Authentication") : ""
+                font: LingmoTextStyle.BodyStrong
+            }
+            LingmoTextBox{
+                id: username_entry
+                placeholderText: qsTr("Username")
+                Layout.fillWidth: true
+                cleanEnabled: false
+            }
+            LingmoTextBox{
+                id: password_entry
+                placeholderText: qsTr("Password")
+                Layout.fillWidth: true
+                cleanEnabled: false
+            }
+            RowLayout{
+                spacing: 10
+                Layout.alignment: Qt.AlignRight
+                LingmoFilledButton{
+                    text: qsTr("OK")
+                    Layout.alignment: Qt.AlignRight
+                    onClicked: {
+                        authentication_request_popup.request.dialogAccept(username_entry.text,password_entry.text);
+                        authentication_request_popup.close();
+                    }
+                }
+                LingmoButton{
+                    text: qsTr("Cancel")
+                    Layout.alignment: Qt.AlignRight
+                    onClicked: {
+                        authentication_request_popup.request.dialogReject()
+                        authentication_request_popup.close();
+                    }
+                }
+            }
+        }
+    }
+    LingmoPopup{
+        id: certificate_error_popup
+        width: 400
+        padding: 10
+        bottomPadding: 20
+        modal: false
+        property WebEngineCertificateError request
+        ColumnLayout{
+            anchors.fill: parent
+            anchors.margins: 10
+            spacing: 10
+            LingmoText{
+                text: certificate_error_popup.request ? certificate_error_popup.request.url + qsTr(" Has Certificate Error:") : ""
+                font: LingmoTextStyle.BodyStrong
+            }
+            LingmoText{
+                text: certificate_error_popup.request ? certificate_error_popup.request.description : ""
+                font: LingmoTextStyle.Body
+            }
+            RowLayout{
+                spacing: 10
+                Layout.alignment: Qt.AlignRight
+                LingmoFilledButton{
+                    text: qsTr("Continue Access")
+                    Layout.alignment: Qt.AlignRight
+                    onClicked: {
+                        certificate_error_popup.request.acceptCertificate();
+                        certificate_error_popup.close();
+                    }
+                }
+                LingmoButton{
+                    text: qsTr("Leave")
+                    Layout.alignment: Qt.AlignRight
+                    onClicked: {
+                        certificate_error_popup.request.rejectCertificate()
+                        certificate_error_popup.close();
                     }
                 }
             }

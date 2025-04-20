@@ -9,36 +9,61 @@ import LingmoUI
 
 LingmoPopup{
     id: popup
-    width: 600
-    height: 400
+    width: 400
+    height: 50
     modal: false
-    closePolicy: pinned ? LingmoPopup.CloseOnEscape : LingmoPopup.CloseOnEscape|LingmoPopup.CloseOnPressOutside
-    property bool pinned: false
-    property LingmoWindow parentWindow
-    LingmoText{
-        id: heading
-        text: qsTr("Find On Page")
-        anchors.top: parent.top
-        anchors.left: parent.left
-        anchors.topMargin: 20
-        anchors.leftMargin: 20
-        font: LingmoTextStyle.Title
-    }
+    closePolicy: LingmoPopup.CloseOnEscape
+    property bool is_opened: false
+    property WebEngineView parentView
+    property bool case_sensitive: false
     RowLayout{
         spacing: 10
-        anchors.right: parent.right
+        anchors.leftMargin: 10
+        anchors.fill: parent
+        LingmoTextBox{
+            id: text_box
+            Layout.fillWidth: true
+            onTextChanged: {
+                if(popup.case_sensitive){
+                    popup.parentView.findText(text,WebEngineView.FindCaseSensitively)
+                }
+                else{
+                    popup.parentView.findText(text)
+                }
+            }
+            Connections{
+                target: popup.parentView
+                function onFindTextFinished(result){
+                    text_information.text=result.activeMatch.toString()+"/"+result.numberOfMatches.toString();
+                }
+            }
+        }
+        LingmoText{
+            id: text_information
+            text: "0/0"
+        }
         LingmoIconButton{
-            iconSource: popup.pinned ? LingmoIcons.PinnedFill : LingmoIcons.Pin
+            iconSource: popup.case_sensitive ? LingmoIcons.FullAlpha : LingmoIcons.HalfAlpha
             Layout.alignment: Qt.AlignVCenter
+            text: popup.case_sensitive ? qsTr("Cancel Find Case Sensitively") : qsTr("Find Case Sensitively")
             onClicked: {
-                popup.pinned = !popup.pinned
+                popup.case_sensitive = !popup.case_sensitive;
+                if(popup.case_sensitive){
+                    popup.parentView.findText(text,WebEngineView.FindCaseSensitively)
+                }
+                else{
+                    popup.parentView.findText(text)
+                }
             }
         }
         LingmoIconButton{
             iconSource: LingmoIcons.Cancel
+            text: qsTr("Close")
             Layout.alignment: Qt.AlignVCenter
             onClicked: {
                 popup.close()
+                popup.is_opened=false;
+                popup.parentView.findText("")
             }
         }
     }

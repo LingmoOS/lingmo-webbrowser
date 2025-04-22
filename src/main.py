@@ -1,7 +1,7 @@
 import sys
 import os
 from handlers import *
-from data import SettingsData, DownloadHistoryData
+from data import SettingsData, DownloadHistoryData, HistoryData
 import updRes
 import LingmoUIPy
 import res
@@ -37,6 +37,9 @@ if __name__ == "__main__":
     )
     qmlRegisterSingletonType(
         DownloadHistoryData, "org.lingmo.webbrowser", 1, 0, "DownloadHistoryData"
+    )
+    qmlRegisterSingletonType(
+        HistoryData, "org.lingmo.webbrowser", 1, 0, "HistoryData"
     )
     QtWebEngineQuick.initialize()
     handler = UrlSchemeHandler()

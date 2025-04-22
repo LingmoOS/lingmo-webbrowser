@@ -4,22 +4,34 @@ from PySide6.QtQuick import *
 from PySide6.QtCore import *
 from PySide6.QtWebEngineQuick import *
 import json
+import datetime
 
 data = {
     "../resources/data/settings.json": {},
     "../resources/data/downloadHistory.json": {},
+    "../resources/data/history.json": {},
 }
 for i in data:
     with open(i, "r", encoding="utf-8") as f:
         data[i] = json.load(f)
 
 
-def Data(file, i):
-    return data[file][i]
+def Data(file, prop):
+    return data[file][prop]
 
 
-def dumpData(file, property, val):
-    data[file][property] = val
+def dumpData(file, prop, val):
+    data[file][prop] = val
+    with open(file, "w", encoding="utf-8") as f:
+        json.dump(data[file], f, indent=4)
+
+
+def DataAll(file):
+    return data[file]
+
+
+def dumpDataAll(file, val):
+    data[file] = val
     with open(file, "w", encoding="utf-8") as f:
         json.dump(data[file], f, indent=4)
 
@@ -83,3 +95,48 @@ class DownloadHistoryData(QQuickItem):
     @Slot(int)
     def delete(self, index):
         self.downloadHistory.pop(index)
+        dumpData("../resources/data/downloadHistory.json", "list", self.downloadHistory)
+    
+    @Slot()
+    def clear(self):
+        self.downloadHistory.clear()
+        dumpData("../resources/data/downloadHistory.json", "list", self.downloadHistory)
+
+
+class HistoryData(QQuickItem):
+    history: dict = DataAll("../resources/data/history.json")
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+    @Slot(int, str, str, result=type)
+    def get(self, date, index, prop):
+        return self.history[date][index][prop]
+    
+    @Slot(result=type)
+    def getDates(self):
+        return list(self.history.keys())
+
+    @Slot(str, str, str, str, bool, bool)
+    def append(
+        self, title, favicon, url, time
+    ):
+        self.history[datetime.datetime.strftime("%Y-%m-%d")].append(
+            {
+                "title": title,
+                "favicon": favicon,
+                "url": url,
+                "time": time
+            }
+        )
+        dumpDataAll("../resources/data/history.json", self.history)
+
+    @Slot(int)
+    def delete(self, index):
+        self.history.pop(index)
+        dumpDataAll("../resources/data/history.json", self.history)
+
+    @Slot()
+    def clear(self):
+        self.history.clear()
+        dumpDataAll("../resources/data/history.json", self.history)

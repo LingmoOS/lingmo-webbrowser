@@ -748,6 +748,13 @@ LingmoWindow{
                         webView_.is_fullscreen=false;
                     }
                 }
+                Connections{
+                    target: btn_download
+                    enabled: window.isCurrentTab(argument.id)
+                    function onClicked(){
+                        download_popup.parentView=webView_
+                    }
+                }
                 Component.onCompleted: {
                     newWindowFirstView=webView_;
                     btn_back.enabled = canGoBack;

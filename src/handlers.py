@@ -111,3 +111,12 @@ class UrlSchemeHandler(QWebEngineUrlSchemeHandler):
 
     def requestStarted(self, job: QWebEngineUrlRequestJob):
         job.reply(QByteArray("text/html"),job.requestBody())
+
+
+class ClipboardHandler(QQuickItem):
+    def __init__(self):
+        super().__init__()
+        self.clipboard=QClipboard()
+    @Slot(str)
+    def write(self,content):
+        self.clipboard.setText(content)

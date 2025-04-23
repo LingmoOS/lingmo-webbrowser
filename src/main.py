@@ -17,6 +17,7 @@ if __name__ == "__main__":
     scheme.setDefaultPort(2345)
     scheme.setFlags(QWebEngineUrlScheme.Flag.SecureScheme)
     QWebEngineUrlScheme.registerScheme(scheme)
+    QtWebEngineQuick.initialize()
     app = QGuiApplication(sys.argv)
     app.setWindowIcon(QIcon(":/images/browser.svg"))
     qmlRegisterSingletonType(
@@ -41,7 +42,9 @@ if __name__ == "__main__":
     qmlRegisterSingletonType(
         HistoryData, "org.lingmo.webbrowser", 1, 0, "HistoryData"
     )
-    QtWebEngineQuick.initialize()
+    qmlRegisterSingletonType(
+        ClipboardHandler, "org.lingmo.webbrowser", 1, 0, "ClipboardHandler"
+    )
     handler = UrlSchemeHandler()
     QQuickWebEngineProfile.defaultProfile().installUrlSchemeHandler(
         QByteArray("browser"), handler

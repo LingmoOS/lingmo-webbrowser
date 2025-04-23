@@ -2,3 +2,4 @@ src/__pycache__/
 src/res.py
 resources/data/storage
 resources/data/cache
+resources/data/*.json

@@ -480,7 +480,7 @@ LingmoWindow{
                 }
                 onIconChanged:{
                     var str=icon.toString();
-                    web_tabView.get(now_index()).tab_icon=str.replace("image://favicon/","");
+                    web_tabView.get(nowIndex).tab_icon=str.replace("image://favicon/","");
                 }
                 onLinkHovered: function(link){
                     link_popup.visible=true;
@@ -767,9 +767,9 @@ LingmoWindow{
                     contextMenuItem_forward.enabled = canGoForward;
                     contextMenuItem_reload_cancel.iconSource=loading ? LingmoIcons.Cancel : LingmoIcons.Refresh ;
                     contextMenuItem_reload_cancel.text=loading ? qsTr('Cancel Reload') : qsTr('Reload');
-                    profile.persistentStoragePath=Qt.resolvedUrl(".").toString().replace("qml/global","data/storage").replace("file:///","");
+                    profile.persistentStoragePath=Qt.resolvedUrl(".").toString().replace("qml/global","data/storage").replace("file:///",Qt.platform.os==="linux" ? "/" :"");
                     profile.persistentCookiesPolicy=WebEngineProfile.ForcePersistentCookies;
-                    profile.cachePath=Qt.resolvedUrl(".").toString().replace("qml/global","data/cache").replace("file:///","");
+                    profile.cachePath=Qt.resolvedUrl(".").toString().replace("qml/global","data/cache").replace("file:///",Qt.platform.os==="linux" ? "/" :"");
                     profile.httpCacheType=WebEngineProfile.DiskHttpCache;
                     for(var i=0;i<targets.length;i++){
                         targets[i].clicked.connect(function(){

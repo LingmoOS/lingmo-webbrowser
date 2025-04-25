@@ -325,6 +325,7 @@ LingmoWindow{
         SplitView{
             WebEngineView{
                 id: webView_
+                visible: !(collections_page.visible||download_page.visible||extension_page.visible||history_page.visible||settings_page.visible||start_page.visible)
                 SplitView.preferredWidth: parent.width*0.7
                 SplitView.fillHeight: true
                 url: argument.url
@@ -777,36 +778,6 @@ LingmoWindow{
                         })
                     }
                 }
-                Collections{
-                    id: collections_page
-                    visible: argument.url=="browser://collections/"
-                    z: 32767
-                }
-                Downloads{
-                    id: download_page
-                    visible: argument.url=="browser://downloads/"
-                    z: 32767
-                }
-                Extensions{
-                    id: extension_page
-                    visible: argument.url=="browser://extensions/"
-                    z: 32767
-                }
-                History{
-                    id: history_page
-                    visible: argument.url=="browser://history/"
-                    z: 32767
-                }
-                Settings{
-                    id: settings_page
-                    visible: argument.url=="browser://settings/"
-                    z: 32767
-                }
-                StartPage{
-                    id: start_page
-                    visible: argument.url=="browser://start/"
-                    z: 32767
-                }
                 FindOnPagePopup{
                     id: find_on_page_popup
                     parentView: webView_
@@ -823,6 +794,36 @@ LingmoWindow{
                     start_page.visible=false;
                 }
             }
+            Collections{
+                id: collections_page
+                visible: argument.url=="browser://collections/"
+                z: 32767
+            }
+            Downloads{
+                id: download_page
+                visible: argument.url=="browser://downloads/"
+                z: 32767
+            }
+            Extensions{
+                id: extension_page
+                visible: argument.url=="browser://extensions/"
+                z: 32767
+            }
+            History{
+                id: history_page
+                visible: argument.url=="browser://history/"
+                z: 32767
+            }
+            Settings{
+                id: settings_page
+                visible: argument.url=="browser://settings/"
+                z: 32767
+            }
+            StartPage{
+                id: start_page
+                visible: argument.url=="browser://start/"
+                z: 32767
+            }
             WebEngineView{
                 id: webView_devtools
                 url: "http://127.0.0.1:1112/devtools/inspector.html?ws=127.0.0.1:1112/devtools/page/"+webView_.devToolsId
@@ -835,7 +836,7 @@ LingmoWindow{
                     toolTip.text=request.text;
                     toolTip.requestType=request.type;
                 }
-            }
+            } 
         }
     }
     LingmoMenu{

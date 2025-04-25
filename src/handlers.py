@@ -110,7 +110,7 @@ class UrlSchemeHandler(QWebEngineUrlSchemeHandler):
         super().__init__()
 
     def requestStarted(self, job: QWebEngineUrlRequestJob):
-        job.reply(QByteArray("text/html"),job.requestBody())
+        job.fail(QWebEngineUrlRequestJob.Error.RequestFailed)
 
 
 class ClipboardHandler(QQuickItem):

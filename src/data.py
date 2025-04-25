@@ -7,13 +7,34 @@ import json
 import datetime
 
 data = {
-    "../resources/data/settings.json": {},
-    "../resources/data/downloadHistory.json": {},
+    "../resources/data/settings.json": {
+        "homeUrl": "browser://start/",
+        "windowPos": [
+            0,
+            0
+        ],
+        "windowSize": [
+            -1,
+            -1
+        ],
+        "downloadPath": "C:/Users/\u4e50\u4e50/Downloads"
+    },
+    "../resources/data/downloadHistory.json": {
+        "list": [
+
+        ]
+    },
     "../resources/data/history.json": {},
 }
 for i in data:
-    with open(i, "r", encoding="utf-8") as f:
-        data[i] = json.load(f)
+    try:
+        with open(i, "r", encoding="utf-8") as f:
+            data[i] = json.load(f)
+    except:
+        with open(i, "w", encoding="utf-8") as f:
+            json.dump(data[i], f, indent=4)
+        with open(i, "r", encoding="utf-8") as f:
+            data[i] = json.load(f)
 
 
 def Data(file, prop):

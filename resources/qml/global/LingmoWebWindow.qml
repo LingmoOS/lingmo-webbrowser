@@ -331,6 +331,7 @@ LingmoWindow{
                 url: argument.url
                 property bool is_fullscreen: false
                 property real prev_zoomFactor: 1.0
+                property int nowIndex: {return now_index();}
                 onAuthenticationDialogRequested: function(request){
                     request.accepted=true;
                     authentication_request_popup.request=request;
@@ -533,10 +534,10 @@ LingmoWindow{
                 }
                 onTitleChanged:{
                     if(window.getSpecialTitle(url)==="New Tab"){
-                        web_tabView.get(now_index()).text=title;
+                        web_tabView.get(nowIndex).text=title;
                     }
                     else{
-                        web_tabView.get(now_index()).text=window.getSpecialTitle(url);
+                        web_tabView.get(nowIndex).text=window.getSpecialTitle(url);
                     }
                 }
                 onTooltipRequested: function(request){

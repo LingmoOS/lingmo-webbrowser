@@ -92,8 +92,8 @@ class UrlRedirectHandler(QQuickItem):
             return url
         if is_valid_browser_url(url):
             return url
-        elif is_valid_url("http://" + url):
-            return "http://" + url
+        elif is_valid_url("https://" + url):
+            return "https://" + url
         elif is_valid_localfile_url(url):
             return url
         else:
@@ -110,7 +110,7 @@ class UrlSchemeHandler(QWebEngineUrlSchemeHandler):
         super().__init__()
 
     def requestStarted(self, job: QWebEngineUrlRequestJob):
-        job.fail(QWebEngineUrlRequestJob.Error.RequestFailed)
+        job.fail(QWebEngineUrlRequestJob.Error.NoError)
 
 
 class ClipboardHandler(QQuickItem):

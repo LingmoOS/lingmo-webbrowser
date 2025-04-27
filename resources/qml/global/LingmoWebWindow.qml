@@ -331,7 +331,6 @@ LingmoWindow{
                 url: argument.url
                 property bool is_fullscreen: false
                 property real prev_zoomFactor: 1.0
-                property int nowIndex: {return now_index();}
                 onAuthenticationDialogRequested: function(request){
                     request.accepted=true;
                     authentication_request_popup.request=request;
@@ -579,7 +578,6 @@ LingmoWindow{
                 }
                 settings.pluginsEnabled: true
                 settings.fullScreenSupportEnabled: true
-                profile.offTheRecord: false
                 profile.downloadPath: {return SettingsData.downloadPath}
                 settings.localStorageEnabled: true
                 profile.onDownloadRequested: function(request){
@@ -767,6 +765,8 @@ LingmoWindow{
                     contextMenuItem_forward.enabled = canGoForward;
                     contextMenuItem_reload_cancel.iconSource=loading ? LingmoIcons.Cancel : LingmoIcons.Refresh ;
                     contextMenuItem_reload_cancel.text=loading ? qsTr('Cancel Reload') : qsTr('Reload');
+                    profile.storageName="main"
+                    profile.offTheRecord=false
                     profile.persistentStoragePath=Qt.resolvedUrl(".").toString().replace("qml/global","data/storage").replace("file:///",Qt.platform.os==="linux" ? "/" :"");
                     profile.persistentCookiesPolicy=WebEngineProfile.ForcePersistentCookies;
                     profile.cachePath=Qt.resolvedUrl(".").toString().replace("qml/global","data/cache").replace("file:///",Qt.platform.os==="linux" ? "/" :"");

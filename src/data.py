@@ -130,24 +130,35 @@ class HistoryData(QQuickItem):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-    @Slot(int, str, str, result=type)
+    @Slot(str, int, str, result=str)
     def get(self, date, index, prop):
         return self.history[date][index][prop]
     
-    @Slot(result=type)
+    @Slot(str, result=str)
+    def getLast(self, prop):
+        return self.history[list(self.history.keys())[-1]][-1][prop]
+    
+    @Slot(result=list)
     def getDates(self):
         return list(self.history.keys())
+    
+    @Slot(str, result=list)
+    def getDateList(self, date):
+        return self.history[date]
 
-    @Slot(str, str, str, str, bool, bool)
+    @Slot(str, str, str)
     def append(
-        self, title, favicon, url, time
+        self, title, favicon, url
     ):
-        self.history[datetime.datetime.strftime("%Y-%m-%d")].append(
+        nowdate=datetime.datetime.now().strftime("%Y-%m-%d")
+        if not (nowdate in self.history.keys()):
+            self.history[nowdate]=[]
+        self.history[nowdate].append(
             {
                 "title": title,
                 "favicon": favicon,
                 "url": url,
-                "time": time
+                "time": datetime.datetime.now().strftime("%H:%M")
             }
         )
         dumpDataAll("../resources/data/history.json", self.history)

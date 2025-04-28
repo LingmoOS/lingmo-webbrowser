@@ -499,6 +499,9 @@ LingmoWindow{
                     if(loading){
                         web_tabView.setCurrentTabIcon("qrc:/images/browser.svg")
                     }
+                    if(HistoryData.getLast("url")!=webView_.url){
+                        HistoryData.append(title,icon,webView_.url);
+                    }
                 }
                 onNewWindowRequested: function(request) {
                     switch(request.destination){

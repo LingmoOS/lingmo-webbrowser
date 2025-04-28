@@ -797,32 +797,44 @@ LingmoWindow{
             }
             Collections{
                 id: collections_page
-                visible: argument.url=="browser://collections/"
+                SplitView.preferredWidth: parent.width*0.7
+                SplitView.fillHeight: true
+                visible: argument.url==="browser://collections/" || argument.url==="browser://collections"
                 z: 32767
             }
             Downloads{
                 id: download_page
-                visible: argument.url=="browser://downloads/"
+                SplitView.preferredWidth: parent.width*0.7
+                SplitView.fillHeight: true
+                visible: argument.url==="browser://downloads/" || argument.url==="browser://downloads"
                 z: 32767
             }
             Extensions{
                 id: extension_page
-                visible: argument.url=="browser://extensions/"
+                SplitView.preferredWidth: parent.width*0.7
+                SplitView.fillHeight: true
+                visible: argument.url==="browser://extensions/" || argument.url==="browser://extensions"
                 z: 32767
             }
             History{
                 id: history_page
-                visible: argument.url=="browser://history/"
+                SplitView.preferredWidth: parent.width*0.7
+                SplitView.fillHeight: true
+                visible: argument.url==="browser://history/" || argument.url==="browser://history"
                 z: 32767
             }
             Settings{
                 id: settings_page
-                visible: argument.url=="browser://settings/"
+                SplitView.preferredWidth: parent.width*0.7
+                SplitView.fillHeight: true
+                visible: argument.url==="browser://settings/" || argument.url==="browser://settings"
                 z: 32767
             }
             StartPage{
                 id: start_page
-                visible: argument.url=="browser://start/"
+                SplitView.preferredWidth: parent.width*0.7
+                SplitView.fillHeight: true
+                visible: argument.url==="browser://start/" || argument.url==="browser://start"
                 z: 32767
             }
             WebEngineView{

@@ -17,6 +17,7 @@ LingmoPopup{
     property bool pinned: false
     property LingmoWindow parentWindow
     property var historyKeys: {return HistoryData.getDates()}
+    signal flushRequested
     ColumnLayout{
         id: content_layout
         anchors.fill: parent
@@ -66,9 +67,11 @@ LingmoPopup{
             ScrollBar.vertical: LingmoScrollBar{}
             clip: true
             delegate: LingmoFrame{
+                id: frame_delegate
                 padding: 10
                 anchors.left: parent.left
                 anchors.right: parent.right
+                anchors.rightMargin: 15
                 ColumnLayout{
                     LingmoText{
                         text: popup_.historyKeys[index]
@@ -77,18 +80,21 @@ LingmoPopup{
                     ListView{
                         id: views
                         property string date: popup_.historyKeys[index]
+                        Layout.preferredHeight: listView_model.count*30
                         model: ListModel{
                             id: listView_model
                         }
                         Layout.fillWidth: true
-                        Layout.fillHeight: true
-                        delegate: LingmoFrame{ 
+                        delegate: LingmoButton{ 
+                            width: popup_.width-65
                             RowLayout{
-                                Layout.fillWidth: true
                                 // Image{
                                 //     source: model.favicon
+                                //     Layout.preferredWidth: 14
+                                //     Layout.preferredHeight: 14
                                 // }
                                 LingmoText{
+                                    Layout.preferredWidth: 200
                                     text: model.title
                                     elide: Qt.ElideRight
                                 }
@@ -96,15 +102,31 @@ LingmoPopup{
                                     color: LingmoColor.Grey100
                                     text: model.time
                                 }
+                                LingmoIconButton{
+                                    iconSource: LingmoIcons.Cancel
+                                    onClicked: {
+                                        HistoryData.delete(views.date,index);
+                                        frame_delegate.flush();
+                                    }
+                                }
                             }
                         }
                         Component.onCompleted: {
-                            var p=HistoryData.getDateList(views.date);
-                            for(var i=0;i<p.length;i++){
-                                print(p[i].favicon,p[i].title);
-                                listView_model.append(p[i]);
+                            flush();
+                        }
+                        Connections{
+                            target: popup_
+                            function onFlushRequested(){
+                                flush();
                             }
                         }
+                    }
+                }
+                function flush(){
+                    listView_model.clear();
+                    var p=HistoryData.getDateList(views.date);
+                    for(var i=0;i<p.length;i++){
+                        listView_model.append({title:p[i].title,time:p[i].time});
                     }
                 }
             }

@@ -163,9 +163,14 @@ class HistoryData(QQuickItem):
         )
         dumpDataAll("../resources/data/history.json", self.history)
 
-    @Slot(int)
-    def delete(self, index):
-        self.history.pop(index)
+    @Slot(str, int)
+    def delete(self, date, index):
+        self.history[date].pop(index)
+        dumpDataAll("../resources/data/history.json", self.history)
+
+    @Slot(str, int)
+    def remove(self, date):
+        self.history.pop(date)
         dumpDataAll("../resources/data/history.json", self.history)
 
     @Slot()

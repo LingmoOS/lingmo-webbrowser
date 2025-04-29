@@ -501,6 +501,7 @@ LingmoWindow{
                     }
                     if(HistoryData.getLast("url")!=webView_.url){
                         HistoryData.append(title,icon,webView_.url);
+                        history_popup.flushRequested();
                     }
                 }
                 onNewWindowRequested: function(request) {

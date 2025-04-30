@@ -52,11 +52,17 @@ LingmoPopup{
                 LingmoIconButton{
                     iconSource: LingmoIcons.Cancel
                     Layout.alignment: Qt.AlignVCenter
+                    visible: !popup_.pinned
                     onClicked: {
                         popup_.close()
                     }
                 }
             }
+        }
+        LingmoTextBox{
+            id: text_box
+            placeholderText: qsTr("Search...")
+            Layout.fillWidth: true
         }
         ListView{
             id: history_view
@@ -72,6 +78,7 @@ LingmoPopup{
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.rightMargin: 15
+                visible: views.searchCount()!==0
                 ColumnLayout{
                     LingmoText{
                         text: popup_.historyKeys[index]
@@ -80,54 +87,78 @@ LingmoPopup{
                     ListView{
                         id: views
                         property string date: popup_.historyKeys[index]
-                        Layout.preferredHeight: listView_model.count*30
+                        Layout.preferredHeight: searchCount()*30
                         model: ListModel{
                             id: listView_model
                         }
                         Layout.fillWidth: true
                         delegate: LingmoButton{ 
+                            id: itemBtn
                             width: popup_.width-65
+                            visible: model.title.includes(text_box.text)
                             RowLayout{
-                                // Image{
-                                //     source: model.favicon
-                                //     Layout.preferredWidth: 14
-                                //     Layout.preferredHeight: 14
-                                // }
+                                x: (itemBtn.width-width)/2
+                                y: (itemBtn.height-height)/2
+                                Image{
+                                    source: model.favicon
+                                    Layout.preferredWidth: 20
+                                    Layout.preferredHeight: 20
+                                }
                                 LingmoText{
-                                    Layout.preferredWidth: 200
+                                    Layout.preferredWidth: 180
                                     text: model.title
                                     elide: Qt.ElideRight
                                 }
                                 LingmoText{
+                                    Layout.preferredWidth: 30
                                     color: LingmoColor.Grey100
                                     text: model.time
                                 }
                                 LingmoIconButton{
                                     iconSource: LingmoIcons.Cancel
+                                    Layout.preferredWidth: 25
+                                    Layout.preferredHeight: 25
+                                    padding: 0
+                                    verticalPadding: 0
+                                    horizontalPadding: 0
+                                    iconSize: 15
                                     onClicked: {
                                         HistoryData.delete(views.date,index);
-                                        frame_delegate.flush();
+                                        popup_.flushRequested();
                                     }
                                 }
                             }
                         }
-                        Component.onCompleted: {
-                            flush();
-                        }
-                        Connections{
-                            target: popup_
-                            function onFlushRequested(){
-                                flush();
+                        function searchCount(){
+                            var count=0;
+                            for(var i=0;i<listView_model.count;i++){
+                                count+=(listView_model.get(i).title.includes(text_box.text)?1:0);
                             }
+                            return count;
                         }
+                    }
+                }
+                Component.onCompleted: {
+                    popup_.flushRequested();
+                }
+                Connections{
+                    target: popup_
+                    function onFlushRequested(){
+                        flush();
                     }
                 }
                 function flush(){
                     listView_model.clear();
                     var p=HistoryData.getDateList(views.date);
                     for(var i=0;i<p.length;i++){
-                        listView_model.append({title:p[i].title,time:p[i].time});
+                        listView_model.append({favicon:p[i].favicon,title:p[i].title,time:p[i].time});
                     }
+                }
+            }
+            Connections{
+                target: popup_
+                function onFlushRequested(){
+                    popup_.historyKeys=HistoryData.getDates();
                 }
             }
         }

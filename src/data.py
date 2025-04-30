@@ -136,6 +136,10 @@ class HistoryData(QQuickItem):
     
     @Slot(str, result=str)
     def getLast(self, prop):
+        if list(self.history.keys())==[]:
+            return None
+        if self.history[list(self.history.keys())[-1]]==[]:
+            return None
         return self.history[list(self.history.keys())[-1]][-1][prop]
     
     @Slot(result=list)
@@ -144,7 +148,7 @@ class HistoryData(QQuickItem):
     
     @Slot(str, result=list)
     def getDateList(self, date):
-        return self.history[date]
+        return self.history.get(date)
 
     @Slot(str, str, str)
     def append(
@@ -163,9 +167,21 @@ class HistoryData(QQuickItem):
         )
         dumpDataAll("../resources/data/history.json", self.history)
 
+
+    @Slot(str, str, str)
+    def setLast(
+        self, title, favicon, url
+    ):
+        self.history[list(self.history.keys())[-1]][-1]["title"]=title
+        self.history[list(self.history.keys())[-1]][-1]["favicon"]=favicon
+        self.history[list(self.history.keys())[-1]][-1]["url"]=url
+        dumpDataAll("../resources/data/history.json", self.history)
+
     @Slot(str, int)
     def delete(self, date, index):
         self.history[date].pop(index)
+        if self.history[date]==[]:
+            self.remove(date)
         dumpDataAll("../resources/data/history.json", self.history)
 
     @Slot(str, int)

@@ -480,6 +480,14 @@ LingmoWindow{
                 onIconChanged:{
                     var str=icon.toString();
                     web_tabView.get(nowIndex).tab_icon=str.replace("image://favicon/","");
+                    if(HistoryData.getLast("url")!=webView_.url){
+                        HistoryData.append(web_tabView.get(nowIndex).text,web_tabView.get(nowIndex).tab_icon,webView_.url);
+                        history_popup.flushRequested();
+                    }
+                    else{
+                        HistoryData.setLast(web_tabView.get(nowIndex).text,web_tabView.get(nowIndex).tab_icon,webView_.url);
+                        history_popup.flushRequested();
+                    }
                 }
                 onLinkHovered: function(link){
                     link_popup.visible=true;
@@ -499,9 +507,15 @@ LingmoWindow{
                     if(loading){
                         web_tabView.setCurrentTabIcon("qrc:/images/browser.svg")
                     }
-                    if(HistoryData.getLast("url")!=webView_.url){
-                        HistoryData.append(title,icon,webView_.url);
-                        history_popup.flushRequested();
+                    else{
+                        if(HistoryData.getLast("url")!=webView_.url){
+                            HistoryData.append(web_tabView.get(nowIndex).text,web_tabView.get(nowIndex).tab_icon,webView_.url);
+                            history_popup.flushRequested();
+                        }
+                        else{
+                            HistoryData.setLast(web_tabView.get(nowIndex).text,web_tabView.get(nowIndex).tab_icon,webView_.url);
+                            history_popup.flushRequested();
+                        }
                     }
                 }
                 onNewWindowRequested: function(request) {

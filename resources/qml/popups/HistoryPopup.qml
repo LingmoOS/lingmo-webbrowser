@@ -39,7 +39,7 @@ LingmoPopup{
                     iconSource: LingmoIcons.More
                     Layout.alignment: Qt.AlignVCenter
                     onClicked: {
-                        menu.open();
+                        more_menu.open();
                     }
                 }
                 LingmoIconButton{
@@ -80,9 +80,29 @@ LingmoPopup{
                 anchors.rightMargin: 15
                 visible: views.searchCount()!==0
                 ColumnLayout{
-                    LingmoText{
-                        text: popup_.historyKeys[index]
-                        font: LingmoTextStyle.BodyStrong
+                    RowLayout{
+                        Layout.preferredWidth: frame_delegate.width-20
+                        spacing: width-dateTitle.width-removeDateBtn.width
+                        LingmoText{
+                            id: dateTitle
+                            text: popup_.historyKeys[index]
+                            font: LingmoTextStyle.BodyStrong
+                        }
+                        LingmoIconButton{
+                            id: removeDateBtn
+                            Layout.alignment: Qt.AlignRight
+                            iconSource: LingmoIcons.Cancel
+                            Layout.preferredWidth: 20
+                            Layout.preferredHeight: 20
+                            padding: 0
+                            verticalPadding: 0
+                            horizontalPadding: 0
+                            iconSize: 15
+                            onClicked:{
+                                HistoryData.remove(popup_.historyKeys[index]);
+                                popup_.flushRequested();
+                            }
+                        }
                     }
                     ListView{
                         id: views
@@ -95,7 +115,7 @@ LingmoPopup{
                         delegate: LingmoButton{ 
                             id: itemBtn
                             width: popup_.width-65
-                            visible: model.title.includes(text_box.text)
+                            visible: model.title.includes(text_box.text) || model.dstUrl.includes(text_box.text)
                             RowLayout{
                                 x: (itemBtn.width-width)/2
                                 y: (itemBtn.height-height)/2
@@ -126,7 +146,15 @@ LingmoPopup{
                                         HistoryData.delete(views.date,index);
                                         popup_.flushRequested();
                                     }
+                                    text: qsTr("Delete Record")
                                 }
+                            }
+                            LingmoTooltip{
+                                text: model.title+"\n"+model.dstUrl
+                                visible: itemBtn.hovered
+                            }
+                            onClicked: {
+                                popup_.parentWindow.newTab(model.dstUrl)
                             }
                         }
                         function searchCount(){
@@ -151,7 +179,7 @@ LingmoPopup{
                     listView_model.clear();
                     var p=HistoryData.getDateList(views.date);
                     for(var i=0;i<p.length;i++){
-                        listView_model.append({favicon:p[i].favicon,title:p[i].title,time:p[i].time});
+                        listView_model.append({favicon:p[i].favicon,title:p[i].title,time:p[i].time,dstUrl:p[i].url});
                     }
                 }
             }
@@ -164,13 +192,76 @@ LingmoPopup{
         }
     }
     LingmoMenu{
-        id: menu
+        id: more_menu
+        width: 250
+        x: 300-width
+        y: more_btn.y+more_btn.height
         LingmoMenuItem{
             iconSource: LingmoIcons.NewWindow
-            text: "Open History Page"
+            text: qsTr("Open Downloads Page")
             onClicked: {
                 popup_.close();
-                parentWindow.newTab("browser://history/")
+                parentWindow.newTab("browser://downloads/")
+            }
+        }
+        LingmoMenuItem{
+            iconSource: LingmoIcons.Delete
+            text: qsTr("Clear All Download Records")
+            onClicked: {
+                DownloadHistoryData.clear();
+            }
+        }
+        LingmoMenuItem{
+            iconSource: LingmoIcons.FileExplorer
+            text: qsTr("Open Download Directory")
+            onClicked: {
+                FileManagerHandler.open(parentView.profile.downloadPath)
+            }
+        }
+        LingmoMenuItem{
+            iconSource: LingmoIcons.FileExplorer
+            text: qsTr("Open Download Settings")
+            onClicked: {
+                
+            }
+        }
+    }
+    LingmoMenu{
+        id: delegate_menu
+        width: 250
+        property WebEngineDownloadRequest request
+        property int requestIndex
+        LingmoMenuItem{
+            iconSource: LingmoIcons.OpenFile
+            text: qsTr("Open File")
+            onClicked: {
+                FileManagerHandler.open(delegate_menu.request.downloadDirectory+"/"+delegate_menu.request.downloadFileName)
+            }
+        }
+        LingmoMenuItem{
+            iconSource: LingmoIcons.Folder
+            text: qsTr("Show In Explorer")
+            onClicked: {
+                FileManagerHandler.open(delegate_menu.request.downloadDirectory)
+            }
+        }
+        LingmoMenuItem{
+            iconSource: LingmoIcons.Link
+            text: qsTr("Copy Download Link")
+            onClicked: {
+                ClipboardHandler.write(delegate_menu.request.url)
+            }
+        }
+        LingmoMenuItem{
+            id: menuItem_cancel_delete
+            iconSource: delegate_menu.request && delegate_menu.request.isFinished ? LingmoIcons.Delete : LingmoIcons.Cancel
+            text: delegate_menu.request && delegate_menu.request.isFinished ? qsTr("Delete File") : qsTr("Cancel Downloading")
+        }
+        LingmoMenuItem{
+            iconSource: LingmoIcons.Cancel
+            text: qsTr("Remove From List")
+            onClicked: {
+                popup_.download_requests.remove(delegate_menu.requestIndex)
             }
         }
     }

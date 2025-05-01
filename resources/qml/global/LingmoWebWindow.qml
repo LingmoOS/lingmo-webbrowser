@@ -480,14 +480,7 @@ LingmoWindow{
                 onIconChanged:{
                     var str=icon.toString();
                     web_tabView.get(nowIndex).tab_icon=str.replace("image://favicon/","");
-                    if(HistoryData.getLast("url")!=webView_.url){
-                        HistoryData.append(web_tabView.get(nowIndex).text,web_tabView.get(nowIndex).tab_icon,webView_.url);
-                        history_popup.flushRequested();
-                    }
-                    else{
-                        HistoryData.setLast(web_tabView.get(nowIndex).text,web_tabView.get(nowIndex).tab_icon,webView_.url);
-                        history_popup.flushRequested();
-                    }
+                    recordHistory();
                 }
                 onLinkHovered: function(link){
                     link_popup.visible=true;
@@ -508,14 +501,7 @@ LingmoWindow{
                         web_tabView.setCurrentTabIcon("qrc:/images/browser.svg")
                     }
                     else{
-                        if(HistoryData.getLast("url")!=webView_.url){
-                            HistoryData.append(web_tabView.get(nowIndex).text,web_tabView.get(nowIndex).tab_icon,webView_.url);
-                            history_popup.flushRequested();
-                        }
-                        else{
-                            HistoryData.setLast(web_tabView.get(nowIndex).text,web_tabView.get(nowIndex).tab_icon,webView_.url);
-                            history_popup.flushRequested();
-                        }
+                        recordHistory();
                     }
                 }
                 onNewWindowRequested: function(request) {
@@ -593,6 +579,10 @@ LingmoWindow{
                 }
                 onWindowCloseRequested: {
                     web_tabView.closeTab(web_tabView.currentIndex);
+                }
+                onZoomFactorChanged: {
+                    zoom_popup.open()
+                    zoom_popup.text=Math.round(zoomFactor*100).toString()+"%"
                 }
                 settings.pluginsEnabled: true
                 settings.fullScreenSupportEnabled: true
@@ -811,6 +801,18 @@ LingmoWindow{
                     history_page.visible=false;
                     settings_page.visible=false;
                     start_page.visible=false;
+                }
+                function recordHistory(){
+                    if(webView_.url){
+                        if(HistoryData.getLast("url")!=webView_.url){
+                            HistoryData.append(web_tabView.get(nowIndex).text,web_tabView.get(nowIndex).tab_icon,webView_.url);
+                            history_popup.flushRequested();
+                        }
+                        else{
+                            HistoryData.setLast(web_tabView.get(nowIndex).text,web_tabView.get(nowIndex).tab_icon,webView_.url);
+                            history_popup.flushRequested();
+                        }
+                    }
                 }
             }
             Collections{

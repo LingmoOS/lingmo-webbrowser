@@ -15,7 +15,7 @@ LingmoPopup{
     width: 350
     height: 400
     modal: false
-    closePolicy: pinned ? LingmoPopup.CloseOnEscape : LingmoPopup.CloseOnEscape|LingmoPopup.CloseOnPressOutside
+    closePolicy: pinned ? LingmoPopup.CloseOnEscape : LingmoPopup.CloseOnEscape|LingmoPopup.CloseOnReleaseOutside
     property bool pinned: false
     property LingmoWindow parentWindow
     property WebEngineView parentView

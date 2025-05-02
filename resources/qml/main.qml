@@ -26,6 +26,14 @@ LingmoObject {
         }
         new_window.show();
     }
+    function newWindowByUrl(url){
+        var new_window=com_web_window.createObject(null,{});
+        if(url){
+            newWindowView.url=url
+            newWindowView.hidePages();
+        }
+        new_window.show();
+    }
     function newDialog(request){
         var new_dialog=com_web_dialog.createObject(null,{});
         if(request){
@@ -50,6 +58,9 @@ LingmoObject {
             }
             onNewDialogRequested: {
                 newDialog(newWindowRequest);
+            }
+            onNewWindowRequestedWithoutRequest: {
+                newWindowByUrl(newWindowRequestUrl);
             }
             Component.onCompleted: {
                 newWindowView=newWindowFirstView;

@@ -41,8 +41,10 @@ LingmoWindow{
     property int contextMenuRequestViewId: 0
     signal newWindowRequested
     signal newDialogRequested
+    signal newWindowRequestedWithoutRequest
     property WebEngineView newWindowFirstView
     property WebEngineNewWindowRequest newWindowRequest
+    property url newWindowRequestUrl
     function getSpecialTitle(url){
         if(url=="browser://collections/"||url=="browser://collections"){
             return "Collections"

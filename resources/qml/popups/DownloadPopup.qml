@@ -41,7 +41,7 @@ LingmoPopup{
                 LingmoIconButton{
                     id: more_btn
                     iconSource: LingmoIcons.More
-                    text: "More"
+                    text: qsTr("More")
                     Layout.alignment: Qt.AlignRight |Qt.AlignVCenter
                     onClicked: {
                         more_menu.open();

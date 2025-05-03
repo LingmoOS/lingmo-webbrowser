@@ -1705,13 +1705,9 @@ LingmoWindow{
                             text: desktop_media_popup.request.windowsModel.data(desktop_media_popup.request.windowsModel.index(index,0))
                             onClicked: {
                                 desktop_media_popup.windowIndex=index;
-                            }
-                            
+                            }    
                         }
                     }
-                }
-                onVisibleChanged:{
-                    print(desktop_media_popup.request.windowsModel.rowCount(desktop_media_popup.request.windowsModel.index(0,0)))
                 }
             }
             RowLayout{

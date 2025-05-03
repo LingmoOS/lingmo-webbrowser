@@ -459,7 +459,7 @@ LingmoWindow{
                     switch(request.mode){
                         case FileDialogRequest.FileModeOpen: {
                             fileDialog.fileMode=FileDialog.OpenFile
-                            fileDialog.nameFilters=request.acceptedMimeTypes
+                            fileDialog.nameFilters=TypeNameConvertHandler.mime2File(request.acceptedMimeTypes)
                             fileDialog.accepted.connect(function(){request.dialogAccept(fileDialog.selectedFiles)});
                             fileDialog.rejected.connect(request.dialogReject);
                             fileDialog.visible = true;
@@ -467,7 +467,7 @@ LingmoWindow{
                         }
                         case FileDialogRequest.FileModeOpenMultiple: {
                             fileDialog.fileMode=FileDialog.OpenFiles
-                            fileDialog.nameFilters=request.acceptedMimeTypes
+                            fileDialog.nameFilters=TypeNameConvertHandler.mime2File(request.acceptedMimeTypes)
                             fileDialog.accepted.connect(function(){request.dialogAccept(fileDialog.selectedFiles)});
                             fileDialog.rejected.connect(request.dialogReject);
                             fileDialog.visible = true;
@@ -481,7 +481,7 @@ LingmoWindow{
                         }
                         case FileDialogRequest.FileModeSave: {
                             fileDialog.fileMode=FileDialog.SaveFile
-                            fileDialog.nameFilters=request.acceptedMimeTypes
+                            fileDialog.nameFilters=TypeNameConvertHandler.mime2File(request.acceptedMimeTypes)
                             fileDialog.accepted.connect(function(){request.dialogAccept(fileDialog.selectedFiles)});
                             fileDialog.rejected.connect(request.dialogReject);
                             fileDialog.visible = true;

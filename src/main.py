@@ -45,6 +45,9 @@ if __name__ == "__main__":
     qmlRegisterSingletonType(
         ClipboardHandler, "org.lingmo.webbrowser", 1, 0, "ClipboardHandler"
     )
+    qmlRegisterSingletonType(
+        TypeNameConvertHandler, "org.lingmo.webbrowser", 1, 0, "TypeNameConvertHandler"
+    )
     handler = UrlSchemeHandler()
     QQuickWebEngineProfile.defaultProfile().installUrlSchemeHandler(
         QByteArray("browser"), handler

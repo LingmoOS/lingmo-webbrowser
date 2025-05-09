@@ -98,7 +98,7 @@ LingmoPopup{
                     ColumnLayout{
                         LingmoText{
                             text: {
-                                return rect_delegate.request.downloadFileName
+                                return (rect_delegate.deleted ? "<s>": "") +rect_delegate.request.downloadFileName+(rect_delegate.deleted ? "</s>": "")
                             }
                             elide: Qt.ElideMiddle
                         }

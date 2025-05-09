@@ -862,6 +862,383 @@ LingmoWindow{
                     y: {return window.appBar.height+toolArea.height}
                     visible: window.isCurrentTab(argument.id) && is_opened
                 }
+                LingmoPopup{
+                    id: feature_request_popup
+                    x: 10
+                    y: {return window.appBar.height+toolArea.height}
+                    width: 400
+                    height: 150
+                    modal: false
+                    property url securityOrigin
+                    property var feature
+                    property string requestText
+                    property WebEngineView webView
+                    ColumnLayout{
+                        anchors.fill: parent
+                        anchors.margins: 10
+                        LingmoText{
+                            text: feature_request_popup.securityOrigin+" "+qsTr("Requests")
+                            font: LingmoTextStyle.BodyStrong
+                        }
+                        LingmoText{
+                            text: feature_request_popup.requestText
+                            font: LingmoTextStyle.Body
+                        }
+                        RowLayout{
+                            spacing: 10
+                            Layout.alignment: Qt.AlignJustify
+                            LingmoButton{
+                                text: qsTr("Accept")
+                                onClicked: {
+                                    feature_request_popup.close();
+                                    feature_request_popup.webView.grantFeaturePermission(feature_request_popup.securityOrigin,feature_request_popup.feature,true);
+                                }
+                            }
+                            LingmoButton{
+                                text: qsTr("Reject")
+                                onClicked: {
+                                    feature_request_popup.close();
+                                    feature_request_popup.webView.grantFeaturePermission(feature_request_popup.securityOrigin,feature_request_popup.feature,false);
+                                }
+                            }
+                        }
+                    }
+                }
+                LingmoPopup{
+                    id: dialog_request_popup
+                    y: {return window.appBar.height+toolArea.height}
+                    width: 400
+                    padding: 10
+                    bottomPadding: 20
+                    modal: false
+                    property JavaScriptDialogRequest request
+                    ColumnLayout{
+                        anchors.fill: parent
+                        anchors.margins: 10
+                        spacing: 10
+                        LingmoText{
+                            text: dialog_request_popup.request ? dialog_request_popup.request.securityOrigin + qsTr(" Displays") : ""
+                            font: LingmoTextStyle.BodyStrong
+                        }
+                        LingmoText{
+                            text: dialog_request_popup.request ? (dialog_request_popup.request.type===JavaScriptDialogRequest.DialogTypeBeforeUnload ? "Are you sure you want to leave this page? The changes you have made may not be saved." : dialog_request_popup.request.message ): ""
+                            wrapMode: Text.WordWrap
+                            font: LingmoTextStyle.Body
+                            Layout.preferredWidth: parent.width-10
+                        }
+                        LingmoTextBox{
+                            id: dialog_entry
+                            visible: dialog_request_popup.request && dialog_request_popup.request.type===JavaScriptDialogRequest.DialogTypePrompt
+                            placeholderText: dialog_request_popup.request ? dialog_request_popup.request.defaultText : ""
+                            Layout.fillWidth: true
+                            cleanEnabled: false
+                        }
+                        RowLayout{
+                            spacing: 10
+                            Layout.alignment: Qt.AlignRight
+                            LingmoFilledButton{
+                                text: qsTr("OK")
+                                Layout.alignment: Qt.AlignRight
+                                onClicked: {
+                                    if(dialog_request_popup.request && dialog_request_popup.request.type===JavaScriptDialogRequest.DialogTypePrompt){
+                                        dialog_request_popup.request.dialogAccept(dialog_entry.text);
+                                    }
+                                    else{
+                                        dialog_request_popup.request.dialogAccept()
+                                    }
+                                    dialog_request_popup.close();
+                                }
+                            }
+                            LingmoButton{
+                                text: qsTr("Cancel")
+                                Layout.alignment: Qt.AlignRight
+                                visible: dialog_request_popup.request &&(dialog_request_popup.request.type===JavaScriptDialogRequest.DialogTypePrompt || 
+                                            dialog_request_popup.request.type===JavaScriptDialogRequest.DialogTypeConfirm ||
+                                            dialog_request_popup.request.type===JavaScriptDialogRequest.DialogTypeBeforeUnload)
+                                onClicked: {
+                                    dialog_request_popup.request.dialogReject()
+                                    dialog_request_popup.close();
+                                }
+                            }
+                        }
+                    }
+                }
+                LingmoPopup{
+                    id: register_protocol_handler_request_popup
+                    x: {return window.width-width-10}
+                    y: {return window.appBar.height+toolArea.height}
+                    width: 400
+                    padding: 10
+                    bottomPadding: 20
+                    modal: false
+                    property var request
+                    ColumnLayout{
+                        anchors.fill: parent
+                        anchors.margins: 10
+                        spacing: 10
+                        LingmoText{
+                            text: register_protocol_handler_request_popup.request ? register_protocol_handler_request_popup.request.origin : ""
+                            font: LingmoTextStyle.BodyStrong
+                        }
+                        LingmoText{
+                            text: qsTr("Requests Register Protocol Handler")
+                            font: LingmoTextStyle.Body
+                            Layout.preferredWidth: parent.width-10
+                        }
+                        RowLayout{
+                            spacing: 10
+                            Layout.alignment: Qt.AlignRight
+                            LingmoFilledButton{
+                                text: qsTr("Accept")
+                                Layout.alignment: Qt.AlignRight
+                                onClicked: {
+                                    register_protocol_handler_request_popup.request.accept();
+                                    register_protocol_handler_request_popup.close();
+                                }
+                            }
+                            LingmoButton{
+                                text: qsTr("Reject")
+                                Layout.alignment: Qt.AlignRight
+                                onClicked: {
+                                    register_protocol_handler_request_popup.request.reject()
+                                    register_protocol_handler_request_popup.close();
+                                }
+                            }
+                        }
+                    }
+                }
+                LingmoPopup{
+                    id: authentication_request_popup
+                    width: 400
+                    padding: 10
+                    bottomPadding: 20
+                    modal: false
+                    property AuthenticationDialogRequest request
+                    ColumnLayout{
+                        anchors.fill: parent
+                        anchors.margins: 10
+                        spacing: 10
+                        LingmoText{
+                            text: authentication_request_popup.request ? authentication_request_popup.request.url + qsTr(" Requests Authentication") : ""
+                            font: LingmoTextStyle.BodyStrong
+                        }
+                        LingmoTextBox{
+                            id: username_entry
+                            placeholderText: qsTr("Username")
+                            Layout.fillWidth: true
+                            cleanEnabled: false
+                        }
+                        LingmoTextBox{
+                            id: password_entry
+                            placeholderText: qsTr("Password")
+                            Layout.fillWidth: true
+                            cleanEnabled: false
+                        }
+                        RowLayout{
+                            spacing: 10
+                            Layout.alignment: Qt.AlignRight
+                            LingmoFilledButton{
+                                text: qsTr("OK")
+                                Layout.alignment: Qt.AlignRight
+                                onClicked: {
+                                    authentication_request_popup.request.dialogAccept(username_entry.text,password_entry.text);
+                                    authentication_request_popup.close();
+                                }
+                            }
+                            LingmoButton{
+                                text: qsTr("Cancel")
+                                Layout.alignment: Qt.AlignRight
+                                onClicked: {
+                                    authentication_request_popup.request.dialogReject();
+                                    authentication_request_popup.close();
+                                }
+                            }
+                        }
+                    }
+                }
+                LingmoPopup{
+                    id: certificate_error_popup
+                    width: 400
+                    padding: 10
+                    bottomPadding: 20
+                    modal: false
+                    property WebEngineCertificateError request
+                    ColumnLayout{
+                        anchors.fill: parent
+                        anchors.margins: 10
+                        spacing: 10
+                        LingmoText{
+                            text: certificate_error_popup.request ? certificate_error_popup.request.url + qsTr(" Has Certificate Error:") : ""
+                            font: LingmoTextStyle.BodyStrong
+                        }
+                        LingmoText{
+                            text: certificate_error_popup.request ? certificate_error_popup.request.description : ""
+                            font: LingmoTextStyle.Body
+                        }
+                        RowLayout{
+                            spacing: 10
+                            Layout.alignment: Qt.AlignRight
+                            LingmoFilledButton{
+                                text: qsTr("Continue Access")
+                                Layout.alignment: Qt.AlignRight
+                                onClicked: {
+                                    certificate_error_popup.request.acceptCertificate();
+                                    certificate_error_popup.close();
+                                }
+                            }
+                            LingmoButton{
+                                text: qsTr("Leave")
+                                Layout.alignment: Qt.AlignRight
+                                onClicked: {
+                                    certificate_error_popup.request.rejectCertificate()
+                                    certificate_error_popup.close();
+                                }
+                            }
+                        }
+                    }
+                }
+                LingmoPopup{
+                    id: connection_popup
+                    x: {return btn_connection.x}
+                    y: {return window.appBar.height+toolArea.height}
+                    width: 470
+                    padding: 10
+                    bottomPadding: 30
+                    modal: false
+                    property WebEngineCertificateError request
+                    closePolicy: LingmoPopup.CloseOnPressOutside
+                    ColumnLayout{
+                        anchors.fill: parent
+                        anchors.margins: 10
+                        spacing: 10
+                        LingmoText{
+                            text: certificate_error_popup.request ? qsTr("Connection is unsafe") : qsTr("Connection is safe")
+                            font: LingmoTextStyle.BodyStrong
+                        }
+                        LingmoText{
+                            text: certificate_error_popup.request ? certificate_error_popup.request.description : qsTr("This site has a valid certificate issued by a trusted authority.")
+                            font: LingmoTextStyle.Body
+                        }
+                    }
+                }
+                LingmoPopup{
+                    id: desktop_media_popup
+                    y: {return window.appBar.height+toolArea.height}
+                    width: 400
+                    padding: 10
+                    bottomPadding: 20
+                    modal: false
+                    property url requestedUrl
+                    property var request
+                    property int screenIndex: 0
+                    property int windowIndex: 0
+                    ColumnLayout{
+                        anchors.fill: parent
+                        anchors.margins: 10
+                        spacing: 10
+                        LingmoText{
+                            text: desktop_media_popup.request ? desktop_media_popup.requestedUrl + qsTr(" Requests Sharing:") : ""
+                            font: LingmoTextStyle.BodyStrong
+                        }
+                        TabBar{
+                            id: tab_desktop_media_type
+                            Layout.fillWidth: true
+                            TabButton{
+                                text: qsTr("Screens")
+                                width: tab_desktop_media_type.width / 2
+                            }
+                            TabButton{
+                                text: qsTr("Windows")
+                                width: tab_desktop_media_type.width / 2
+                            }
+                        }
+                        SwipeView{
+                            interactive: false
+                            currentIndex: tab_desktop_media_type.currentIndex
+                            Layout.fillWidth: true
+                            Layout.preferredHeight: 100
+                            clip: true
+                            Item{
+                                ListView{
+                                    anchors.fill: parent
+                                    model: desktop_media_popup.request ? desktop_media_popup.request.screensModel : 0
+                                    delegate: LingmoButton{
+                                        text: desktop_media_popup.request.screensModel.data(desktop_media_popup.request.screensModel.index(index,0))
+                                        onClicked: {
+                                            desktop_media_popup.screenIndex=index;
+                                        }
+                                    }
+                                }
+                            }
+                            Item{
+                                ListView{
+                                    anchors.fill: parent
+                                    model: desktop_media_popup.request ? desktop_media_popup.request.windowsModel : 0
+                                    delegate: LingmoButton{
+                                        text: desktop_media_popup.request.windowsModel.data(desktop_media_popup.request.windowsModel.index(index,0))
+                                        onClicked: {
+                                            desktop_media_popup.windowIndex=index;
+                                        }    
+                                    }
+                                }
+                            }
+                        }
+                        RowLayout{
+                            spacing: 10
+                            Layout.alignment: Qt.AlignRight
+                            LingmoFilledButton{
+                                text: qsTr("Share")
+                                Layout.alignment: Qt.AlignRight
+                                onClicked: {
+                                    if(tab_desktop_media_type.currentIndex==0){
+                                        desktop_media_popup.request.selectScreen(desktop_media_popup.request.screensModel.index(desktop_media_popup.screenIndex,0));
+                                    }
+                                    else{
+                                        desktop_media_popup.request.selectWindow(desktop_media_popup.request.windowsModel.index(desktop_media_popup.windowIndex,0));
+                                    }
+                                    desktop_media_popup.close();
+                                    dsktpmda_op_popup.show();
+                                }
+                            }
+                            LingmoButton{
+                                text: qsTr("Cancel")
+                                Layout.alignment: Qt.AlignRight
+                                onClicked: {
+                                    desktop_media_popup.request.cancel();
+                                    desktop_media_popup.close();
+                                }
+                            }
+                        }
+                    }
+                }
+                LingmoWindow{
+                    id: dsktpmda_op_popup
+                    width: 300
+                    height: 45
+                    showMaximize: false
+                    showMinimize: false
+                    showClose: false
+                    stayTop: true
+                    fixSize: true
+                    RowLayout{
+                        spacing: dsktpmda_op_popup.width-dsktpmda_op_popup_text.width-dsktpmda_op_popup_btn.width-3
+                        LingmoText{
+                            id: dsktpmda_op_popup_text
+                            text: desktop_media_popup.requestedUrl+qsTr("\n is capturing")
+                        }
+                        LingmoFilledButton{
+                            id: dsktpmda_op_popup_btn
+                            text: qsTr("Stop Capturing")
+                            onClicked:{
+                                dsktpmda_op_popup.hide()
+                                webView_.runJavaScript("var videosArray = Array.from(document.querySelectorAll('video'));videosArray.forEach(function(video) {video.srcObject.getTracks().forEach(track => track.stop());});")
+                            }
+                        }
+                    }
+                    Component.onCompleted: {
+                        hide();
+                    }
+                }
                 function hidePages(){
                     collections_page.visible=false;
                     download_page.visible=false;
@@ -1388,354 +1765,6 @@ LingmoWindow{
         parentWindow: window
         x: {return btn_zoom.x+contorlRightButtons.x+btn_download.width-width}
         y: {return window.appBar.height+toolArea.height}
-    }
-    LingmoPopup{
-        id: feature_request_popup
-        x: 10
-        y: {return window.appBar.height+toolArea.height}
-        width: 400
-        height: 150
-        modal: false
-        property url securityOrigin
-        property var feature
-        property string requestText
-        property WebEngineView webView
-        ColumnLayout{
-            anchors.fill: parent
-            anchors.margins: 10
-            LingmoText{
-                text: feature_request_popup.securityOrigin+" "+qsTr("Requests")
-                font: LingmoTextStyle.BodyStrong
-            }
-            LingmoText{
-                text: feature_request_popup.requestText
-                font: LingmoTextStyle.Body
-            }
-            RowLayout{
-                spacing: 10
-                Layout.alignment: Qt.AlignJustify
-                LingmoButton{
-                    text: qsTr("Accept")
-                    onClicked: {
-                        feature_request_popup.close();
-                        feature_request_popup.webView.grantFeaturePermission(feature_request_popup.securityOrigin,feature_request_popup.feature,true);
-                    }
-                }
-                LingmoButton{
-                    text: qsTr("Reject")
-                    onClicked: {
-                        feature_request_popup.close();
-                        feature_request_popup.webView.grantFeaturePermission(feature_request_popup.securityOrigin,feature_request_popup.feature,false);
-                    }
-                }
-            }
-        }
-    }
-    LingmoPopup{
-        id: dialog_request_popup
-        y: {return window.appBar.height+toolArea.height}
-        width: 400
-        padding: 10
-        bottomPadding: 20
-        modal: false
-        property JavaScriptDialogRequest request
-        ColumnLayout{
-            anchors.fill: parent
-            anchors.margins: 10
-            spacing: 10
-            LingmoText{
-                text: dialog_request_popup.request ? dialog_request_popup.request.securityOrigin + qsTr(" Displays") : ""
-                font: LingmoTextStyle.BodyStrong
-            }
-            LingmoText{
-                text: dialog_request_popup.request ? (dialog_request_popup.request.type===JavaScriptDialogRequest.DialogTypeBeforeUnload ? "Are you sure you want to leave this page? The changes you have made may not be saved." : dialog_request_popup.request.message ): ""
-                wrapMode: Text.WordWrap
-                font: LingmoTextStyle.Body
-                Layout.preferredWidth: parent.width-10
-            }
-            LingmoTextBox{
-                id: dialog_entry
-                visible: dialog_request_popup.request && dialog_request_popup.request.type===JavaScriptDialogRequest.DialogTypePrompt
-                placeholderText: dialog_request_popup.request ? dialog_request_popup.request.defaultText : ""
-                Layout.fillWidth: true
-                cleanEnabled: false
-            }
-            RowLayout{
-                spacing: 10
-                Layout.alignment: Qt.AlignRight
-                LingmoFilledButton{
-                    text: qsTr("OK")
-                    Layout.alignment: Qt.AlignRight
-                    onClicked: {
-                        if(dialog_request_popup.request && dialog_request_popup.request.type===JavaScriptDialogRequest.DialogTypePrompt){
-                            dialog_request_popup.request.dialogAccept(dialog_entry.text);
-                        }
-                        else{
-                            dialog_request_popup.request.dialogAccept()
-                        }
-                        dialog_request_popup.close();
-                    }
-                }
-                LingmoButton{
-                    text: qsTr("Cancel")
-                    Layout.alignment: Qt.AlignRight
-                    visible: dialog_request_popup.request &&(dialog_request_popup.request.type===JavaScriptDialogRequest.DialogTypePrompt || 
-                                dialog_request_popup.request.type===JavaScriptDialogRequest.DialogTypeConfirm ||
-                                dialog_request_popup.request.type===JavaScriptDialogRequest.DialogTypeBeforeUnload)
-                    onClicked: {
-                        dialog_request_popup.request.dialogReject()
-                        dialog_request_popup.close();
-                    }
-                }
-            }
-        }
-    }
-    LingmoPopup{
-        id: register_protocol_handler_request_popup
-        x: {return window.width-width-10}
-        y: {return window.appBar.height+toolArea.height}
-        width: 400
-        padding: 10
-        bottomPadding: 20
-        modal: false
-        property var request
-        ColumnLayout{
-            anchors.fill: parent
-            anchors.margins: 10
-            spacing: 10
-            LingmoText{
-                text: register_protocol_handler_request_popup.request ? register_protocol_handler_request_popup.request.origin : ""
-                font: LingmoTextStyle.BodyStrong
-            }
-            LingmoText{
-                text: qsTr("Requests Register Protocol Handler")
-                font: LingmoTextStyle.Body
-                Layout.preferredWidth: parent.width-10
-            }
-            RowLayout{
-                spacing: 10
-                Layout.alignment: Qt.AlignRight
-                LingmoFilledButton{
-                    text: qsTr("Accept")
-                    Layout.alignment: Qt.AlignRight
-                    onClicked: {
-                        register_protocol_handler_request_popup.request.accept();
-                        register_protocol_handler_request_popup.close();
-                    }
-                }
-                LingmoButton{
-                    text: qsTr("Reject")
-                    Layout.alignment: Qt.AlignRight
-                    onClicked: {
-                        register_protocol_handler_request_popup.request.reject()
-                        register_protocol_handler_request_popup.close();
-                    }
-                }
-            }
-        }
-    }
-    LingmoPopup{
-        id: authentication_request_popup
-        width: 400
-        padding: 10
-        bottomPadding: 20
-        modal: false
-        property AuthenticationDialogRequest request
-        ColumnLayout{
-            anchors.fill: parent
-            anchors.margins: 10
-            spacing: 10
-            LingmoText{
-                text: authentication_request_popup.request ? authentication_request_popup.request.url + qsTr(" Requests Authentication") : ""
-                font: LingmoTextStyle.BodyStrong
-            }
-            LingmoTextBox{
-                id: username_entry
-                placeholderText: qsTr("Username")
-                Layout.fillWidth: true
-                cleanEnabled: false
-            }
-            LingmoTextBox{
-                id: password_entry
-                placeholderText: qsTr("Password")
-                Layout.fillWidth: true
-                cleanEnabled: false
-            }
-            RowLayout{
-                spacing: 10
-                Layout.alignment: Qt.AlignRight
-                LingmoFilledButton{
-                    text: qsTr("OK")
-                    Layout.alignment: Qt.AlignRight
-                    onClicked: {
-                        authentication_request_popup.request.dialogAccept(username_entry.text,password_entry.text);
-                        authentication_request_popup.close();
-                    }
-                }
-                LingmoButton{
-                    text: qsTr("Cancel")
-                    Layout.alignment: Qt.AlignRight
-                    onClicked: {
-                        authentication_request_popup.request.dialogReject()
-                        authentication_request_popup.close();
-                    }
-                }
-            }
-        }
-    }
-    LingmoPopup{
-        id: certificate_error_popup
-        width: 400
-        padding: 10
-        bottomPadding: 20
-        modal: false
-        property WebEngineCertificateError request
-        ColumnLayout{
-            anchors.fill: parent
-            anchors.margins: 10
-            spacing: 10
-            LingmoText{
-                text: certificate_error_popup.request ? certificate_error_popup.request.url + qsTr(" Has Certificate Error:") : ""
-                font: LingmoTextStyle.BodyStrong
-            }
-            LingmoText{
-                text: certificate_error_popup.request ? certificate_error_popup.request.description : ""
-                font: LingmoTextStyle.Body
-            }
-            RowLayout{
-                spacing: 10
-                Layout.alignment: Qt.AlignRight
-                LingmoFilledButton{
-                    text: qsTr("Continue Access")
-                    Layout.alignment: Qt.AlignRight
-                    onClicked: {
-                        certificate_error_popup.request.acceptCertificate();
-                        certificate_error_popup.close();
-                    }
-                }
-                LingmoButton{
-                    text: qsTr("Leave")
-                    Layout.alignment: Qt.AlignRight
-                    onClicked: {
-                        certificate_error_popup.request.rejectCertificate()
-                        certificate_error_popup.close();
-                    }
-                }
-            }
-        }
-    }
-    LingmoPopup{
-        id: connection_popup
-        x: {return btn_connection.x}
-        y: {return window.appBar.height+toolArea.height}
-        width: 470
-        padding: 10
-        bottomPadding: 30
-        modal: false
-        property WebEngineCertificateError request
-        closePolicy: LingmoPopup.CloseOnPressOutside
-        ColumnLayout{
-            anchors.fill: parent
-            anchors.margins: 10
-            spacing: 10
-            LingmoText{
-                text: certificate_error_popup.request ? qsTr("Connection is unsafe") : qsTr("Connection is safe")
-                font: LingmoTextStyle.BodyStrong
-            }
-            LingmoText{
-                text: certificate_error_popup.request ? certificate_error_popup.request.description : qsTr("This site has a valid certificate issued by a trusted authority.")
-                font: LingmoTextStyle.Body
-            }
-        }
-    }
-    LingmoPopup{
-        id: desktop_media_popup
-        y: {return window.appBar.height+toolArea.height}
-        width: 400
-        padding: 10
-        bottomPadding: 20
-        modal: false
-        property url requestedUrl
-        property var request
-        property int screenIndex: 0
-        property int windowIndex: 0
-        ColumnLayout{
-            anchors.fill: parent
-            anchors.margins: 10
-            spacing: 10
-            LingmoText{
-                text: desktop_media_popup.request ? desktop_media_popup.requestedUrl + qsTr(" Requests Sharing:") : ""
-                font: LingmoTextStyle.BodyStrong
-            }
-            TabBar{
-                id: tab_desktop_media_type
-                Layout.fillWidth: true
-                TabButton{
-                    text: qsTr("Screens")
-                    width: tab_desktop_media_type.width / 2
-                }
-                TabButton{
-                    text: qsTr("Windows")
-                    width: tab_desktop_media_type.width / 2
-                }
-            }
-            SwipeView{
-                interactive: false
-                currentIndex: tab_desktop_media_type.currentIndex
-                Layout.fillWidth: true
-                Layout.preferredHeight: 100
-                clip: true
-                Item{
-                    ListView{
-                        anchors.fill: parent
-                        model: desktop_media_popup.request ? desktop_media_popup.request.screensModel : 0
-                        delegate: LingmoButton{
-                            text: desktop_media_popup.request.screensModel.data(desktop_media_popup.request.screensModel.index(index,0))
-                            onClicked: {
-                                desktop_media_popup.screenIndex=index;
-                            }
-                        }
-                    }
-                }
-                Item{
-                    ListView{
-                        anchors.fill: parent
-                        model: desktop_media_popup.request ? desktop_media_popup.request.windowsModel : 0
-                        delegate: LingmoButton{
-                            text: desktop_media_popup.request.windowsModel.data(desktop_media_popup.request.windowsModel.index(index,0))
-                            onClicked: {
-                                desktop_media_popup.windowIndex=index;
-                            }    
-                        }
-                    }
-                }
-            }
-            RowLayout{
-                spacing: 10
-                Layout.alignment: Qt.AlignRight
-                LingmoFilledButton{
-                    text: qsTr("Share")
-                    Layout.alignment: Qt.AlignRight
-                    onClicked: {
-                        if(tab_desktop_media_type.currentIndex==0){
-                            desktop_media_popup.request.selectScreen(desktop_media_popup.request.screensModel.index(desktop_media_popup.screenIndex,0));
-                        }
-                        else{
-                            desktop_media_popup.request.selectWindow(desktop_media_popup.request.windowsModel.index(desktop_media_popup.windowIndex,0));
-                        }
-                        desktop_media_popup.close();
-                    }
-                }
-                LingmoButton{
-                    text: qsTr("Cancel")
-                    Layout.alignment: Qt.AlignRight
-                    onClicked: {
-                        desktop_media_popup.request.cancel()
-                        desktop_media_popup.close();
-                    }
-                }
-            }
-        }
     }
     LingmoHotkey{
         id: hotkey_toggle_fullscreen
